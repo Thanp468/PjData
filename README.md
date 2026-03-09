@@ -1,184 +1,193 @@
-# PjData
+--DROP
+DROP VIEW v_student_dashboard;
+DROP VIEW student_pending_assignments;
+DROP VIEW student_daily_schedule;
+DROP VIEW v_student_gpa;
 
+DROP SEQUENCE seq_reg_id;
+
+DROP TABLE Notifications CASCADE CONSTRAINTS;
+DROP TABLE TodoList CASCADE CONSTRAINTS;
+DROP TABLE ReviewTeacher CASCADE CONSTRAINTS;
+DROP TABLE AssignScore CASCADE CONSTRAINTS;
+DROP TABLE Grade CASCADE CONSTRAINTS;
+DROP TABLE Register CASCADE CONSTRAINTS;
+DROP TABLE StudyRegister CASCADE CONSTRAINTS;
+DROP TABLE StdAssignment CASCADE CONSTRAINTS;
+DROP TABLE TeachAssignment CASCADE CONSTRAINTS;
+DROP TABLE UserInfo CASCADE CONSTRAINTS;
+DROP TABLE Subject CASCADE CONSTRAINTS;
 DROP TABLE Major CASCADE CONSTRAINTS;
-----------------------------------------------
---1
-DROP TABLE StudySchedule;
-DROP TABLE ReviewTeacher;
-DROP TABLE StudyRegister;
-DROP TABLE AssignScore;
-DROP TABLE Grade;
+DROP TABLE Event CASCADE CONSTRAINTS;
+DROP TABLE Teacher CASCADE CONSTRAINTS;
+DROP TABLE Fact CASCADE CONSTRAINTS;
 
 ----------------------------------------------
---2
-DROP TABLE TeachAssignment;
-DROP TABLE StdAssignment;
-DROP TABLE Register;
-
-----------------------------------------------
---3
-DROP TABLE UserInfo;
-DROP TABLE Subject;
-
-----------------------------------------------
---4
-
-DROP TABLE Teacher;
-DROP TABLE Event;
-DROP TABLE Major;
-DROP TABLE Fact;
-----------------------------------------------
-
+--TABLES
 CREATE TABLE Fact(
-FCode   CHAR(4) PRIMARY KEY,
-FNameENG    VARCHAR2(256),
-FNameTHA       VARCHAR2(256)
+    FCode       VARCHAR2(4) PRIMARY KEY,
+    FNameENG    VARCHAR2(256),
+    FNameTHA    VARCHAR2(256)
 );
 
 CREATE TABLE Major(
-    MjCode      CHAR(4) PRIMARY KEY,
+    MjCode      VARCHAR2(4) PRIMARY KEY,
     MjNameENG   VARCHAR2(256),
     MjNameTHA   VARCHAR2(256),
-    FCode       CHAR(4),
+    FCode       VARCHAR2(4),
     CONSTRAINT Major_fk_Fact FOREIGN KEY (FCode) REFERENCES Fact(FCode)
 );
 
 CREATE TABLE Teacher(
-TID                CHAR(4) PRIMARY KEY,
-TFName      VARCHAR2(50),
-TLName      VARCHAR2(50)
+    TID         VARCHAR2(4) PRIMARY KEY,
+    TFName      VARCHAR2(50),
+    TLName      VARCHAR2(50)
 );
 
 CREATE TABLE Event(
-EventID CHAR(4) PRIMARY KEY,
-EventName   VARCHAR2(150),
-EventStartDate       DATE,
-EventEndDate        DATE,
-EventType       VARCHAR2(50)
+    EventID         VARCHAR2(4) PRIMARY KEY,
+    EventName       VARCHAR2(150),
+    EventStartDate  DATE,
+    EventEndDate    DATE,
+    EventType       VARCHAR2(50)
 );
 
 CREATE TABLE UserInfo(
-    UserID            NUMBER(5)    PRIMARY KEY,
+    UserID      NUMBER(5) PRIMARY KEY,
     UserFName   VARCHAR2(50),
     UserLName   VARCHAR2(50),
-    UserEmail       VARCHAR2(100),
-    UserPass        VARCHAR2(100),
-    FCode               CHAR(4),
-    MjCode              CHAR(4),
-    UserType            CHAR(5),
-CONSTRAINT UserInfo_fk_Fact FOREIGN KEY (FCode) REFERENCES Fact(FCode),
-CONSTRAINT UserInfo_fk_Major FOREIGN KEY (MjCode) REFERENCES Major(MjCode)
+    UserEmail   VARCHAR2(100),
+    UserPass    VARCHAR2(100),
+    FCode       VARCHAR2(4),
+    MjCode      VARCHAR2(4),
+    UserType    VARCHAR2(5),
+    CONSTRAINT UserInfo_fk_Fact FOREIGN KEY (FCode) REFERENCES Fact(FCode),
+    CONSTRAINT UserInfo_fk_Major FOREIGN KEY (MjCode) REFERENCES Major(MjCode)
 );
 
 CREATE TABLE Subject(
-SubjCode CHAR(8) PRIMARY KEY,
-SubjName    VARCHAR2(100),
-SubjCredit      NUMBER(2),
-FCode       CHAR(4),
-SubjType    VARCHAR2(150),
-CONSTRAINT Subject_fk_fact FOREIGN KEY(FCode) REFERENCES Fact(FCode)
+    SubjCode    VARCHAR2(8) PRIMARY KEY,
+    SubjName    VARCHAR2(100),
+    SubjCredit  NUMBER(2),
+    FCode       VARCHAR2(4),
+    SubjType    VARCHAR2(150),
+    CONSTRAINT Subject_fk_fact FOREIGN KEY(FCode) REFERENCES Fact(FCode)
 );
 
 CREATE TABLE Register(
-RegID   CHAR(5) PRIMARY KEY,
-UserID  NUMBER(5),
-EventID CHAR(4),
-CONSTRAINT Register_fk_UserInfo FOREIGN KEY(UserID) REFERENCES UserInfo(UserID),
-CONSTRAINT Register_fk_Event FOREIGN KEY(EventID) REFERENCES Event(EventID)
+    RegID       VARCHAR2(10) PRIMARY KEY,
+    UserID      NUMBER(5),
+    EventID     VARCHAR2(4),
+    CONSTRAINT Register_fk_UserInfo FOREIGN KEY(UserID) REFERENCES UserInfo(UserID),
+    CONSTRAINT Register_fk_Event FOREIGN KEY(EventID) REFERENCES Event(EventID)
 );
 
-CREATE TABLE  StdAssignment(
-AssignID    CHAR(8) PRIMARY KEY,
-SubjCode    CHAR(8),
-AssName     VARCHAR2(150),
-Dateline        DATE,
-Score   NUMBER(3),
-CONSTRAINT  StdAssignment_fk_Subject FOREIGN KEY (SubjCode) REFERENCES Subject(SubjCode)
+CREATE TABLE StdAssignment(
+    AssignID    VARCHAR2(10) PRIMARY KEY,
+    SubjCode    VARCHAR2(8),
+    AssName     VARCHAR2(150),
+    Dateline    DATE,
+    Score       NUMBER(3),
+    CONSTRAINT StdAssignment_fk_Subject FOREIGN KEY (SubjCode) REFERENCES Subject(SubjCode)
 );
 
-DROP TABLE TeachAssignment CASCADE CONSTRAINTS;
-CREATE  TABLE TeachAssignment(
-    TAssignID  CHAR(5) PRIMARY KEY,
-    TID        CHAR(4),
-    SubjCode   CHAR(8),
+CREATE TABLE TeachAssignment(
+    TAssignID  VARCHAR2(5) PRIMARY KEY,
+    TID        VARCHAR2(4),
+    SubjCode   VARCHAR2(8),
     Year       NUMBER(4),
     Semester   NUMBER(1),
     StudyDay   VARCHAR2(10),
     StartTime  VARCHAR2(5),
     EndTime    VARCHAR2(5),
     Room       VARCHAR2(20),
+    CONSTRAINT chk_study_day CHECK (StudyDay IN ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY')),
     CONSTRAINT TeachAssignment_fk_Teacher FOREIGN KEY (TID) REFERENCES Teacher(TID),
     CONSTRAINT TeachAssignment_fk_SubjCode FOREIGN KEY (SubjCode) REFERENCES Subject(SubjCode)
 );
 
 CREATE TABLE StudyRegister(
-    StuRegisID  NUMBER(5) PRIMARY KEY, TAssignID CHAR(5),
-    UserID      NUMBER(5),
-    Section NUMBER(3), StuRegisStatus VARCHAR2(10),
+    StuRegisID      NUMBER(5) PRIMARY KEY, 
+    TAssignID       VARCHAR2(5),
+    UserID          NUMBER(5),
+    Section         NUMBER(3), 
+    StuRegisStatus  VARCHAR2(15),
     CONSTRAINT StudyRegister_fk_TeachAssignment FOREIGN KEY (TAssignID) REFERENCES TeachAssignment(TAssignID),
     CONSTRAINT StudyRegister_fk_UserInfo FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
 );
 
 CREATE TABLE Grade(
-GradeCode   CHAR(5) PRIMARY KEY,
-SubjCode    CHAR(8),
-UserID          NUMBER(5),
-StuRegisID  NUMBER(5),
-GradeResult VARCHAR2(1),
-CONSTRAINT  Grade_fk_subject FOREIGN KEY (SubjCode) REFERENCES subject(SubjCode),
-CONSTRAINT Grade_fk_UserID FOREIGN KEY(UserID) REFERENCES UserInfo(UserID),
-CONSTRAINT Grade_fk_StudyRegister FOREIGN KEY(StuRegisID) REFERENCES StudyRegister(StuRegisID)
+    GradeCode   NUMBER(5) PRIMARY KEY,
+    StuRegisID  NUMBER(5),
+    GradeResult VARCHAR2(2),
+    CONSTRAINT Grade_fk_StudyRegister FOREIGN KEY(StuRegisID) REFERENCES StudyRegister(StuRegisID)
 );
 
 CREATE TABLE AssignScore(
-ScoreAssignID   CHAR(6) PRIMARY KEY,
-UserID                NUMBER(5),
-AssignID             CHAR(8),
-Status                  VARCHAR2(10),
-PriScore              NUMBER(3),
-CONSTRAINT AssignScore_fk_UserInfo FOREIGN KEY(UserID) REFERENCES UserInfo(UserID),
-CONSTRAINT AssignScore_fk_StdAssignment FOREIGN KEY(AssignID) REFERENCES StdAssignment(AssignID)
+    ScoreAssignID NUMBER(6) PRIMARY KEY,
+    UserID        NUMBER(5),
+    AssignID      VARCHAR2(10),
+    Status        VARCHAR2(15),
+    PriScore      NUMBER(3),
+    CONSTRAINT AssignScore_fk_UserInfo FOREIGN KEY(UserID) REFERENCES UserInfo(UserID),
+    CONSTRAINT AssignScore_fk_StdAssignment FOREIGN KEY(AssignID) REFERENCES StdAssignment(AssignID)
 );
 
 CREATE TABLE ReviewTeacher(
-TeachReview CHAR(8) PRIMARY KEY,
-AssignID        CHAR(8),
-UserID            NUMBER(5),
-UserReviewT      VARCHAR2(500),
-UserRateT           NUMBER(1),
-CONSTRAINT ReviewTeacher_fk_StdAssignment   FOREIGN KEY (AssignID) REFERENCES StdAssignment(AssignID),
-CONSTRAINT  ReviewTeacher_fk_UserInfo   FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
+    TeachReview NUMBER(8) PRIMARY KEY,
+    AssignID    VARCHAR2(10),
+    UserID      NUMBER(5),
+    UserReviewT VARCHAR2(500),
+    UserRateT   NUMBER(1),
+    CONSTRAINT ReviewTeacher_fk_StdAssignment FOREIGN KEY (AssignID) REFERENCES StdAssignment(AssignID),
+    CONSTRAINT ReviewTeacher_fk_UserInfo FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
 );
 
 CREATE TABLE TodoList (
     TodoID      NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
     UserID      NUMBER(5),
     TaskName    VARCHAR2(256),
-    Priority    VARCHAR2(10), -- HIGH, MEDIUM, LOW
-    IsDone      CHAR(1) DEFAULT 'N', -- Y ???? N
+    Priority    VARCHAR2(10), 
+    IsDone      CHAR(1) DEFAULT 'N',
     CreatedAt   DATE DEFAULT SYSDATE,
     CONSTRAINT Todo_fk_User FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
 );
+
+CREATE TABLE Notifications (
+    NotiID      NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    UserID      NUMBER(5),
+    Message     VARCHAR2(500),
+    NotiDate    DATE DEFAULT SYSDATE,
+    Status      VARCHAR2(10) DEFAULT 'UNREAD',
+    CONSTRAINT Noti_fk_User FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
+);
+
 ------------------------------------------------
---VIEW
+-- 3. VIEWS
 
 CREATE OR REPLACE VIEW v_student_gpa AS
 SELECT 
-    g.UserID,
+    u.UserID,
     u.UserFName || ' ' || u.UserLName AS FullName,
     ROUND(SUM(
         CASE g.GradeResult
-            WHEN 'A' THEN 4.0
-            WHEN 'B' THEN 3.0
-            WHEN 'C' THEN 2.0
-            WHEN 'D' THEN 1.0
+            WHEN 'A'  THEN 4.0
+            WHEN 'B+' THEN 3.5
+            WHEN 'B'  THEN 3.0
+            WHEN 'C+' THEN 2.5
+            WHEN 'C'  THEN 2.0
+            WHEN 'D+' THEN 1.5
+            WHEN 'D'  THEN 1.0
+            WHEN 'F'  THEN 0.0
             ELSE 0.0
         END * s.SubjCredit
-    ) / SUM(s.SubjCredit), 2) AS GPAX
+    ) / NULLIF(SUM(s.SubjCredit), 0), 2) AS GPAX
 FROM Grade g
-JOIN Subject s ON g.SubjCode = s.SubjCode
-JOIN UserInfo u ON g.UserID = u.UserID
-GROUP BY g.UserID, u.UserFName, u.UserLName;
+JOIN StudyRegister sr ON g.StuRegisID = sr.StuRegisID
+JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
+JOIN Subject s ON ta.SubjCode = s.SubjCode
+JOIN UserInfo u ON sr.UserID = u.UserID
+GROUP BY u.UserID, u.UserFName, u.UserLName;
 
 CREATE OR REPLACE VIEW student_daily_schedule AS
 SELECT 
@@ -211,15 +220,6 @@ JOIN StdAssignment sa ON s.SubjCode = sa.SubjCode
 LEFT JOIN AssignScore ans ON sr.UserID = ans.UserID AND sa.AssignID = ans.AssignID
 WHERE (ans.Status IS NULL OR ans.Status != 'SUBMITTED')
   AND sa.Dateline >= TRUNC(SYSDATE);
-  
-  CREATE TABLE Notifications (
-    NotiID      NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
-    UserID      NUMBER(5),
-    Message     VARCHAR2(500),
-    NotiDate    DATE DEFAULT SYSDATE,
-    Status      VARCHAR2(10) DEFAULT 'UNREAD', -- READ, UNREAD
-    CONSTRAINT Noti_fk_User FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
-);
 
 CREATE OR REPLACE VIEW v_student_dashboard AS
 SELECT 
@@ -232,31 +232,26 @@ FROM Notifications n
 UNION ALL
 SELECT 
     UserID,
-    '???????????????: ' || AssName || ' (???? ' || SubjName || ')',
+    'ต้องส่งงาน: ' || AssName || ' (วิชา ' || SubjName || ')',
     Dateline,
     CurrentStatus,
     'PENDING_TASK' AS Type
 FROM student_pending_assignments;
 
 ----------------------------------------------
---sequence
-CREATE SEQUENCE seq_reg_id 
-START WITH 2 
-INCREMENT BY 1;
----------check seq
-SELECT object_type 
-FROM user_objects 
-WHERE object_name = 'SEQ_REG_ID';
-
---------------------------------------------------
---procedure
+--SEQUENCE & PROCEDURES
+CREATE SEQUENCE seq_reg_id START WITH 2 INCREMENT BY 1;
 
 CREATE OR REPLACE PROCEDURE sp_get_student_alerts (
     p_user_id IN NUMBER
 ) AS
 BEGIN
     DBMS_OUTPUT.PUT_LINE('--- Daily Schedule ---');
-    FOR rec IN (SELECT * FROM student_daily_schedule WHERE UserID = p_user_id AND StudyDay = TRIM(UPPER(TO_CHAR(SYSDATE, 'FMDAY')))) LOOP
+    FOR rec IN (
+        SELECT * FROM student_daily_schedule 
+        WHERE UserID = p_user_id 
+          AND StudyDay = TRIM(UPPER(TO_CHAR(SYSDATE, 'FMDAY', 'NLS_DATE_LANGUAGE=AMERICAN')))
+    ) LOOP
         DBMS_OUTPUT.PUT_LINE('Class: ' || rec.SubjName || ' at ' || rec.StartTime || ' Room: ' || rec.Room);
     END LOOP;
 
@@ -265,11 +260,11 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('Task: ' || rec.AssName || ' | Deadline: ' || TO_CHAR(rec.Dateline, 'DD-MON-YYYY'));
     END LOOP;
 END;
-/ 
+/
 
 CREATE OR REPLACE PROCEDURE sp_safe_event_register (
     p_user_id IN NUMBER,
-    p_event_id IN CHAR
+    p_event_id IN VARCHAR2
 ) AS
     v_conflict_count NUMBER;
 BEGIN
@@ -277,7 +272,7 @@ BEGIN
     FROM student_daily_schedule v
     JOIN Event e ON e.EventID = p_event_id
     WHERE v.UserID = p_user_id 
-  AND v.StudyDay = TRIM(UPPER(TO_CHAR(e.EventStartDate, 'FMDAY')));
+      AND v.StudyDay = TRIM(UPPER(TO_CHAR(e.EventStartDate, 'FMDAY', 'NLS_DATE_LANGUAGE=AMERICAN')));
 
     IF v_conflict_count > 0 THEN
         DBMS_OUTPUT.PUT_LINE('Warning: This event conflicts with your class schedule!');
@@ -296,8 +291,8 @@ CREATE OR REPLACE PROCEDURE sp_user_register (
     p_lname IN VARCHAR2,
     p_email IN VARCHAR2,
     p_pass IN VARCHAR2,
-    p_fcode IN CHAR,
-    p_mjcode IN CHAR
+    p_fcode IN VARCHAR2,
+    p_mjcode IN VARCHAR2
 ) AS
 BEGIN
     INSERT INTO UserInfo (UserID, UserFName, UserLName, UserEmail, UserPass, FCode, MjCode, UserType)
@@ -324,138 +319,91 @@ BEGIN
     END IF;
 END;
 /
+
 ------------------------------------------------------------
---Triggers
-
-
+--TRIGGERS
 CREATE OR REPLACE TRIGGER trg_score_notification
 AFTER UPDATE OF PriScore ON AssignScore
 FOR EACH ROW
 BEGIN
     INSERT INTO Notifications (UserID, Message, NotiDate)
-    VALUES (:NEW.UserID, '?????????????????? ' || :NEW.AssignID || ' ????: ?????? ' || :NEW.PriScore || ' ?????', SYSDATE);
+    VALUES (:NEW.UserID, 'แจ้งเตือน: งาน ' || :NEW.AssignID || ' ตรวจแล้ว! คุณได้ ' || :NEW.PriScore || ' คะแนน', SYSDATE);
     
     DBMS_OUTPUT.PUT_LINE('Notification sent to UserID: ' || :NEW.UserID);
 END;
 /
-
-SELECT trigger_name, table_name, status 
-FROM user_triggers;
-SELECT trigger_body 
-FROM user_triggers 
-WHERE trigger_name = 'TRG_SCORE_NOTIFICATION';
 
 CREATE OR REPLACE TRIGGER trg_new_assignment_notification
 AFTER INSERT ON StdAssignment
 FOR EACH ROW
 BEGIN
     INSERT INTO Notifications (UserID, Message)
-    SELECT sr.UserID, '?????????????! : ' || :NEW.AssName || ' (???? ' || :NEW.SubjCode || ') ???????? ' || TO_CHAR(:NEW.Dateline, 'DD/MM/YYYY')
+    SELECT sr.UserID, 'อาจารย์สั่งงานใหม่: ' || :NEW.AssName || ' (วิชา ' || :NEW.SubjCode || ') กำหนดส่ง ' || TO_CHAR(:NEW.Dateline, 'DD/MM/YYYY')
     FROM StudyRegister sr
     JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
     WHERE ta.SubjCode = :NEW.SubjCode 
       AND sr.StuRegisStatus = 'ENROLLED';
 END;
 /
-----------------------------------------------
-
--- sample run Procedure ( UserID 67001 and EventID E001)
-EXEC sp_safe_event_register(67001, 'E001');
-
------------------------------------------------
-SELECT * FROM major;
-SELECT * FROM Event;
-SELECT * FROM teacher;
-SELECT * FROM fact;
-SELECT * FROM userinfo;
-SELECT * FROM register;
-SELECT * FROM StdAssignment;
-SELECT * FROM TeachAssignment;
-SELECT * FROM Grade;
-SELECT * FROM StudyRegister;
 
 -----------------------------------------------
 --TEST INSERT
-
--- Event (???????)
 INSERT INTO Event (EventID, EventName, EventStartDate, EventEndDate, EventType) 
 VALUES ('E001', 'Freshman Orientation', TO_DATE('2026-06-01', 'YYYY-MM-DD'), TO_DATE('2026-06-01', 'YYYY-MM-DD'), 'Academic');
 
--- Subject (???????)
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('F001', 'Science', 'คณะวิทยาศาสตร์');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('M001', 'Computer Science', 'วิทยาการคอมพิวเตอร์', 'F001');
+
 INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) 
 VALUES ('CP101001', 'Introduction to AI', 3, 'F001', 'Core Course');
 INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) 
 VALUES ('CP101002', 'Database Systems', 3, 'F001', 'Core Course');
 
+INSERT INTO Teacher (TID, TFName, TLName) VALUES ('T001', 'Obi-Wan', 'Kenobi');
+INSERT INTO Teacher (TID, TFName, TLName) VALUES ('T002', 'Yoda', 'Master');
 
--- UserInfo (????????) - ??? ID ?????????? 5 ?????????????
 INSERT INTO UserInfo (UserID, UserFName, UserLName, UserEmail, UserPass, FCode, MjCode, UserType) 
 VALUES (67001, 'Anakin', 'Skywalker', 'anakin@kku.ac.th', 'pass123', 'F001', 'M001', 'STD');
 
--- TeachAssignment (??????????????????????????)
 INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
 VALUES ('TA001', 'T001', 'CP101001', 2026, 1, 'MONDAY', '09:00', '12:00', 'CP.01');
 INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
 VALUES ('TA002', 'T002', 'CP101002', 2026, 1, 'WEDNESDAY', '13:00', '16:00', 'CP.02');
 
--- StudyRegister (??????????????)
 INSERT INTO StudyRegister (StuRegisID, TAssignID, UserID, Section, StuRegisStatus) 
 VALUES (10001, 'TA001', 67001, 1, 'ENROLLED');
 INSERT INTO StudyRegister (StuRegisID, TAssignID, UserID, Section, StuRegisStatus) 
 VALUES (10002, 'TA002', 67001, 1, 'ENROLLED');
 
--- Register (????????????????????)
 INSERT INTO Register (RegID, UserID, EventID) 
 VALUES ('R0001', 67001, 'E001');
 
--- StdAssignment (?????????????????????????)
 INSERT INTO StdAssignment (AssignID, SubjCode, AssName, Dateline, Score) 
 VALUES ('ASS00001', 'CP101001', 'Neural Network Lab', TO_DATE('2026-03-15', 'YYYY-MM-DD'), 100);
 
--- AssignScore (?????????????????????????????)
 INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
 VALUES (20001, 67001, 'ASS00001', 'SUBMITTED', 85);
 
--- Grade (??????????)
-INSERT INTO Grade (GradeCode, SubjCode, UserID, StuRegisID, GradeResult) 
-VALUES (30001, 'CP101001', 67001, 10001, 'A');
+-- เกรดตอนนี้อ้างอิงแค่ StuRegisID (ไม่ซ้ำซ้อนแล้ว)
+INSERT INTO Grade (GradeCode, StuRegisID, GradeResult) 
+VALUES (30001, 10001, 'B+');
 
--- ReviewTeacher (??????????????)
 INSERT INTO ReviewTeacher (TeachReview, AssignID, UserID, UserReviewT, UserRateT) 
 VALUES (40001, 'ASS00001', 67001, 'Good material and clear explanation.', 5);
------------------------------------------------
---test join
-SELECT 
-    u.UserFName, 
-    s.SubjName, 
-    ta.StudyDay, 
-    ta.StartTime, 
-    ta.Room
-FROM UserInfo u
-JOIN StudyRegister sr ON u.UserID = sr.UserID
-JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
-JOIN Subject s ON ta.SubjCode = s.SubjCode
-WHERE u.UserID = 67001;
-------------------------------------------------------------------------------------------
-SELECT * FROM major;
 
--- 1.TEACHER add new assignment on subject in Database Systems (CP101002)
+COMMIT;
+
+-----------------------------------------------
+--TEST QUERIES
+SELECT * FROM v_student_gpa;
+
 INSERT INTO StdAssignment (AssignID, SubjCode, AssName, Dateline, Score) 
 VALUES ('ASS999', 'CP101002', 'SQL Project Design', TO_DATE('2026-04-01', 'YYYY-MM-DD'), 50);
 
--- 2. student get notic or not?
 SELECT * FROM Notifications ORDER BY NotiDate DESC;
 
--- run Procedure for see result of Anakin (67001)'s schedule and not turn in assign
+SELECT * FROM v_student_dashboard;
+
 SET SERVEROUTPUT ON;
+EXEC sp_safe_event_register(67001, 'E001');
 EXEC sp_get_student_alerts(67001);
-
-SELECT * FROM Register WHERE UserID = 67001;
-
-SELECT * FROM Notifications WHERE UserID = 67001;
-
-
-ALTER TABLE TeachAssignment ADD CONSTRAINT chk_study_day 
-CHECK (StudyDay IN ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'));
-
-COMMIT;
