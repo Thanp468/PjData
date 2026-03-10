@@ -228,7 +228,7 @@ FROM Notifications n
 UNION ALL
 SELECT 
     UserID,
-    '??????????: ' || AssName || ' (???? ' || SubjName || ')',
+    'งานค้างส่ง: ' || AssName || ' (วิชา ' || SubjName || ')', -- แก้จาก ???
     Dateline,
     CurrentStatus,
     'PENDING_TASK' AS Type
@@ -404,7 +404,7 @@ AFTER UPDATE OF PriScore ON AssignScore
 FOR EACH ROW
 BEGIN
     INSERT INTO Notifications (UserID, Message, NotiDate)
-    VALUES (:NEW.UserID, '?????????: ??? ' || :NEW.AssignID || ' ????????! ?????? ' || :NEW.PriScore || ' ?????', SYSDATE);
+    VALUES (:NEW.UserID, 'ประกาศคะแนน: งาน ' || :NEW.AssignID || ' ตรวจเสร็จแล้ว! คุณได้ ' || :NEW.PriScore || ' คะแนน', SYSDATE);
     
     DBMS_OUTPUT.PUT_LINE('Notification sent to UserID: ' || :NEW.UserID);
 END;
@@ -415,7 +415,7 @@ AFTER INSERT ON StdAssignment
 FOR EACH ROW
 BEGIN
     INSERT INTO Notifications (UserID, Message)
-    SELECT sr.UserID, '??????????????????: ' || :NEW.AssName || ' (???? ' || :NEW.SubjCode || ') ???????? ' || TO_CHAR(:NEW.Dateline, 'DD/MM/YYYY')
+    SELECT sr.UserID, 'มีงานใหม่: ' || :NEW.AssName || ' (วิชา ' || :NEW.SubjCode || ') กำหนดส่ง ' || TO_CHAR(:NEW.Dateline, 'DD/MM/YYYY')
     FROM StudyRegister sr
     JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
     WHERE ta.SubjCode = :NEW.SubjCode 
