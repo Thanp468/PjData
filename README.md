@@ -101,11 +101,11 @@ CREATE TABLE TeachAssignment(
     Year       NUMBER(4),
     Semester   NUMBER(1),
     StudyDay   VARCHAR2(10),
-    StartTime  TIMESTAMP,   -- เปลี่ยนเป็น TIMESTAMP
-    EndTime    TIMESTAMP,   -- เปลี่ยนเป็น TIMESTAMP
+    StartTime  TIMESTAMP,
+    EndTime    TIMESTAMP,
     Room       VARCHAR2(20),
     CONSTRAINT chk_study_day CHECK (StudyDay IN ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY')),
-    CONSTRAINT chk_time_logic CHECK (EndTime > StartTime), -- ป้องกันการกรอกเวลาผิด!
+    CONSTRAINT chk_time_logic CHECK (EndTime > StartTime),
     CONSTRAINT TeachAssignment_fk_Teacher FOREIGN KEY (TID) REFERENCES Teacher(TID),
     CONSTRAINT TeachAssignment_fk_SubjCode FOREIGN KEY (SubjCode) REFERENCES Subject(SubjCode)
 );
