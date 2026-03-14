@@ -68,6 +68,12 @@ CREATE TABLE UserInfo(
     CONSTRAINT UserInfo_fk_Major FOREIGN KEY (MjCode) REFERENCES Major(MjCode)
 );
 
+CREATE TABLE RegistrationStatus (
+    UserID INT(5) PRIMARY KEY,
+    Status VARCHAR(20),
+    CONSTRAINT RegStatus_fk_User FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
+);
+
 CREATE TABLE Subject(
     SubjCode    VARCHAR2(8) PRIMARY KEY,
     SubjName    VARCHAR2(100),
@@ -314,6 +320,24 @@ SELECT
 FROM Event
 WHERE EventStartDate >= TRUNC(SYSDATE)
 ORDER BY EventStartDate ASC;
+
+CREATE OR REPLACE VIEW student_daily_schedule AS
+SELECT 
+    u.UserID,
+    CONCAT(u.UserFName, ' ', u.UserLName) AS FullName,
+    s.SubjCode,
+    s.SubjName,
+    CONCAT(t.TFName, ' ', t.TLName) AS TeacherName, /*  เพิ่มคอลัมน์นี้เข้ามา */
+    ta.StudyDay,
+    ta.StartTime,
+    ta.EndTime,
+    ta.Room
+FROM UserInfo u
+JOIN StudyRegister sr ON u.UserID = sr.UserID
+JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
+JOIN Subject s ON ta.SubjCode = s.SubjCode
+JOIN Teacher t ON ta.TID = t.TID /*  เพิ่ม JOIN ตารางอาจารย์ */
+WHERE sr.StuRegisStatus = 'ENROLLED';
 
 ----------------------------------------------
 --SEQUENCE & PROCEDURES
