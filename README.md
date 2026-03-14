@@ -1,11 +1,21 @@
 --DROP
+----------------------------------------------
+-- DROP VIEWS
 DROP VIEW v_student_dashboard;
 DROP VIEW student_pending_assignments;
 DROP VIEW student_daily_schedule;
 DROP VIEW v_student_gpa;
+DROP VIEW v_faculty_student_count;
+DROP VIEW v_student_event_summary;
+DROP VIEW v_teacher_performance_rating;
+DROP VIEW v_event_popularity;
+DROP VIEW v_student_feedbacks;
+DROP VIEW v_freshmen_events_board;
 
+-- DROP SEQUENCE
 DROP SEQUENCE seq_reg_id;
 
+-- DROP TABLES
 DROP TABLE Notifications CASCADE CONSTRAINTS;
 DROP TABLE ReviewTeacher CASCADE CONSTRAINTS;
 DROP TABLE AssignScore CASCADE CONSTRAINTS;
@@ -68,12 +78,6 @@ CREATE TABLE UserInfo(
     CONSTRAINT UserInfo_fk_Major FOREIGN KEY (MjCode) REFERENCES Major(MjCode)
 );
 
-CREATE TABLE RegistrationStatus (
-    UserID INT(5) PRIMARY KEY,
-    Status VARCHAR(20),
-    CONSTRAINT RegStatus_fk_User FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
-);
-
 CREATE TABLE Subject(
     SubjCode    VARCHAR2(8) PRIMARY KEY,
     SubjName    VARCHAR2(100),
@@ -107,11 +111,11 @@ CREATE TABLE TeachAssignment(
     Year       NUMBER(4),
     Semester   NUMBER(1),
     StudyDay   VARCHAR2(10),
-    StartTime  TIMESTAMP,
-    EndTime    TIMESTAMP,
+    StartTime  TIMESTAMP,   -- ??????????? TIMESTAMP
+    EndTime    TIMESTAMP,   -- ??????????? TIMESTAMP
     Room       VARCHAR2(20),
     CONSTRAINT chk_study_day CHECK (StudyDay IN ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY')),
-    CONSTRAINT chk_time_logic CHECK (EndTime > StartTime),
+    CONSTRAINT chk_time_logic CHECK (EndTime > StartTime), -- ?????????????????????!
     CONSTRAINT TeachAssignment_fk_Teacher FOREIGN KEY (TID) REFERENCES Teacher(TID),
     CONSTRAINT TeachAssignment_fk_SubjCode FOREIGN KEY (SubjCode) REFERENCES Subject(SubjCode)
 );
@@ -163,6 +167,11 @@ CREATE TABLE Notifications (
     CONSTRAINT Noti_fk_User FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
 );
 
+CREATE TABLE RegistrationStatus (
+    UserID NUMBER(5) PRIMARY KEY,
+    Status VARCHAR2(20),
+    CONSTRAINT RegStatus_fk_User FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
+);
 ------------------------------------------------
 -- 3. VIEWS
 
@@ -193,10 +202,10 @@ GROUP BY u.UserID, u.UserFName, u.UserLName;
 CREATE OR REPLACE VIEW student_daily_schedule AS
 SELECT 
     u.UserID,
-    CONCAT(u.UserFName, ' ', u.UserLName) AS FullName,
+    CONCAT(CONCAT(u.UserFName, ' '), u.UserLName) AS FullName, 
     s.SubjCode,
     s.SubjName,
-    CONCAT(t.TFName, ' ', t.TLName) AS TeacherName, /*  เพิ่มคอลัมน์นี้เข้ามา */
+    CONCAT(CONCAT(t.TFName, ' '), t.TLName) AS TeacherName,
     ta.StudyDay,
     ta.StartTime,
     ta.EndTime,
@@ -205,7 +214,7 @@ FROM UserInfo u
 JOIN StudyRegister sr ON u.UserID = sr.UserID
 JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
 JOIN Subject s ON ta.SubjCode = s.SubjCode
-JOIN Teacher t ON ta.TID = t.TID /*  เพิ่ม JOIN ตารางอาจารย์ */
+JOIN Teacher t ON ta.TID = t.TID 
 WHERE sr.StuRegisStatus = 'ENROLLED';
 
 CREATE OR REPLACE VIEW student_pending_assignments AS
@@ -235,11 +244,12 @@ FROM Notifications n
 UNION ALL
 SELECT 
     UserID,
-    'งานค้างส่ง: ' || AssName || ' (วิชา ' || SubjName || ')', -- แก้จาก ???
+    'งานค้างส่ง: ' || AssName || ' (วิชา ' || SubjName || ')',
     Dateline,
     CurrentStatus,
     'PENDING_TASK' AS Type
 FROM student_pending_assignments;
+
 
 CREATE OR REPLACE VIEW v_faculty_student_count AS
 SELECT 
@@ -445,14 +455,14 @@ VALUES ('CP101001', 'Introduction to AI', 3, 'F001', 'Core Course');
 INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) 
 VALUES ('CP101002', 'Database Systems', 3, 'F001', 'Core Course');
 
--- ใช้ INSERT Teacher ชุดใหม่ที่มี FCode, MjCode
+-- ??? INSERT Teacher ???????????? FCode, MjCode
 INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES ('T001', 'Obi-Wan', 'Kenobi', 'F001', 'M001');
 INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES ('T002', 'Yoda', 'Master', 'F001', 'M001');
 
 INSERT INTO UserInfo (UserID, UserFName, UserLName, UserEmail, UserPass, FCode, MjCode, UserType) 
 VALUES (67001, 'Anakin', 'Skywalker', 'anakin@kku.ac.th', 'pass123', 'F001', 'M001', 'STD');
 
--- ใช้ INSERT TeachAssignment ชุดใหม่ที่เป็น TO_TIMESTAMP
+-- ??? INSERT TeachAssignment ?????????????? TO_TIMESTAMP
 INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
 VALUES ('TA001', 'T001', 'CP101001', 2026, 1, 'MONDAY', TO_TIMESTAMP('09:00', 'HH24:MI'), TO_TIMESTAMP('12:00', 'HH24:MI'), 'CP.01');
 INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
@@ -475,7 +485,7 @@ VALUES (20001, 67001, 'ASS00001', 'SUBMITTED', 85);
 INSERT INTO Grade (GradeCode, StuRegisID, GradeResult) 
 VALUES (30001, 10001, 'B+');
 
--- ใช้ INSERT ReviewTeacher ชุดใหม่ที่แก้เป็น TAssignID แล้ว (มีแค่บรรทัดเดียว)
+-- ??? INSERT ReviewTeacher ????????????????? TAssignID ???? (????????????????)
 INSERT INTO ReviewTeacher (TeachReview, TAssignID, UserID, UserReviewT, UserRateT) 
 VALUES (40001, 'TA001', 67001, 'Good material and clear explanation.', 5);
 
@@ -497,8 +507,3 @@ SELECT * FROM v_student_dashboard;
 
 SET SERVEROUTPUT ON;
 EXEC sp_safe_event_register(67001, 'E001');
-EXEC sp_get_student_alerts(67001);
-
---;
-
-SELECT * FROM UserInfo;
