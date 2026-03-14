@@ -491,4 +491,163 @@ VALUES (40001, 'TA001', 67001, 'สอนดีมาก', 5);
 INSERT INTO RegistrationStatus (UserID, Status) VALUES (67001, 'ACTIVE');
 INSERT INTO RegistrationStatus (UserID, Status) VALUES (67002, 'ACTIVE');
 
+--------- MASTER INSERT SCRIPT FOR 10 STUDENTS
+----------------------------------------------------------------------
+
+-- 1. ข้อมูลพื้นฐาน (Fact & Major)
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('TEC6', 'College of Computing', 'วิทยาลัยการคอมพิวเตอร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('TEC3', 'Faculty of Engineering', 'คณะวิศวกรรมศาสตร์');
+
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('CP01', 'Artificial Intelligence', 'ปัญญาประดิษฐ์', 'TEC6');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('CP02', 'Computer Science', 'วิทยาการคอมพิวเตอร์', 'TEC6');
+
+-- 2. ข้อมูลอาจารย์และรายวิชา
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES ('C001', 'ยุทธนา', 'นาคประสิทธิ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES ('C002', 'ลลิตา', 'ตารักษ์', 'TEC6', 'CP01');
+
+INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) VALUES ('CP101', 'AI Intro', 3, 'TEC6', 'Core');
+INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) VALUES ('CP102', 'Database', 3, 'TEC6', 'Core');
+
+INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
+VALUES ('TA01', 'C001', 'CP101', 2026, 1, 'MONDAY', TO_TIMESTAMP('09:00','HH24:MI'), TO_TIMESTAMP('12:00','HH24:MI'), 'CP.01');
+INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
+VALUES ('TA02', 'C002', 'CP102', 2026, 1, 'WEDNESDAY', TO_TIMESTAMP('13:00','HH24:MI'), TO_TIMESTAMP('16:00','HH24:MI'), 'CP.02');
+
+-- 3. ข้อมูลนักศึกษา 10 คน
+INSERT INTO UserInfo VALUES (67001, 'กิตติ', 'ตั้งใจ', 'kitti@kku.ac.th', 'pw123', 'TEC6', 'CP01', 'STD');
+INSERT INTO UserInfo VALUES (67002, 'มารตี', 'ศรีใส', 'maratee@kku.ac.th', 'pw123', 'TEC6', 'CP01', 'STD');
+INSERT INTO UserInfo VALUES (67003, 'สมชาย', 'สายโค้ด', 'somchai@kku.ac.th', 'pw123', 'TEC6', 'CP02', 'STD');
+INSERT INTO UserInfo VALUES (67004, 'วิไล', 'ไอที', 'wilai@kku.ac.th', 'pw123', 'TEC6', 'CP02', 'STD');
+INSERT INTO UserInfo VALUES (67005, 'ปิติ', 'ขยัน', 'piti@kku.ac.th', 'pw123', 'TEC6', 'CP01', 'STD');
+INSERT INTO UserInfo VALUES (67006, 'มานะ', 'อุตสาหะ', 'mana@kku.ac.th', 'pw123', 'TEC6', 'CP01', 'STD');
+INSERT INTO UserInfo VALUES (67007, 'ชูใจ', 'ใฝ่เรียน', 'choojai@kku.ac.th', 'pw123', 'TEC6', 'CP02', 'STD');
+INSERT INTO UserInfo VALUES (67008, 'วีระ', 'กล้าหาญ', 'weera@kku.ac.th', 'pw123', 'TEC6', 'CP02', 'STD');
+INSERT INTO UserInfo VALUES (67009, 'ดวงใจ', 'มุ่งมั่น', 'duangjai@kku.ac.th', 'pw123', 'TEC6', 'CP01', 'STD');
+INSERT INTO UserInfo VALUES (67010, 'สมศรี', 'ดีงาม', 'somsri@kku.ac.th', 'pw123', 'TEC6', 'CP02', 'STD');
+
+-- 4. ลงทะเบียนเรียน (สลับกันลง AI บ้าง Database บ้าง)
+INSERT INTO StudyRegister VALUES (101, 'TA01', 67001, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (102, 'TA02', 67001, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (103, 'TA01', 67002, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (104, 'TA02', 67003, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (105, 'TA01', 67004, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (106, 'TA02', 67005, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (107, 'TA01', 67006, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (108, 'TA02', 67007, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (109, 'TA01', 67008, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (110, 'TA02', 67009, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (111, 'TA01', 67010, 1, 'ENROLLED');
+
+-- 5. สั่งงาน (Assignments)
+INSERT INTO StdAssignment VALUES ('ASS01', 'CP101', 'AI Lab 1', TO_DATE('2026-03-20','YYYY-MM-DD'), 100);
+INSERT INTO StdAssignment VALUES ('ASS02', 'CP102', 'DB Project', TO_DATE('2026-03-25','YYYY-MM-DD'), 100);
+
+-- 6. ส่งงานและให้คะแนน (บางคนส่งแล้ว บางคนยังไม่ส่ง)
+INSERT INTO AssignScore VALUES (201, 67001, 'ASS01', 'SUBMITTED', 85);
+INSERT INTO AssignScore VALUES (202, 67002, 'ASS01', 'SUBMITTED', 90);
+INSERT INTO AssignScore VALUES (203, 67003, 'ASS02', 'SUBMITTED', 75);
+INSERT INTO AssignScore VALUES (204, 67001, 'ASS02', 'NOT SUBMITTED', 0);
+
+-- 7. ให้เกรด (เพื่อเช็ก View GPA)
+INSERT INTO Grade VALUES (301, 101, 'A');
+INSERT INTO Grade VALUES (302, 102, 'B+');
+INSERT INTO Grade VALUES (303, 103, 'C');
+INSERT INTO Grade VALUES (304, 104, 'A');
+
+-- 8. กิจกรรม (Events)
+INSERT INTO Event VALUES ('E01', 'AI Hackathon', TO_DATE('2026-04-01','YYYY-MM-DD'), TO_DATE('2026-04-02','YYYY-MM-DD'), 'Contest');
+INSERT INTO Register VALUES ('REG01', 67001, 'E01');
+INSERT INTO Register VALUES ('REG02', 67002, 'E01');
+INSERT INTO Register VALUES ('REG03', 67003, 'E01');
+
+-- 9. รีวิวอาจารย์
+INSERT INTO ReviewTeacher VALUES (401, 'TA01', 67001, 'สอนดีมากครับ', 5);
+INSERT INTO ReviewTeacher VALUES (402, 'TA02', 67003, 'เนื้อหาแน่นมาก', 4);
+
+-- 10. สถานะการลงทะเบียน
+DELETE FROM RegistrationStatus;
+INSERT INTO RegistrationStatus SELECT UserID, 'ACTIVE' FROM UserInfo;
+
+----------------------------------------------------------------------
+-- INSERT ข้อมูลแจ้งเตือนสำหรับ Dashboard (ตาราง Notifications)
+----------------------------------------------------------------------
+
+-- ลบข้อมูลเก่าออกก่อนเพื่อให้ข้อมูลใหม่ดูสะอาด
+DELETE FROM Notifications;
+
+-- การแจ้งเตือนสำหรับ กิตติ (67001)
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67001, 'ผลการเรียนวิชา AI Intro (CP101) ออกแล้ว ตรวจสอบได้ที่เมนูผลการเรียน', SYSDATE-1, 'UNREAD');
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67001, 'งานกลุ่ม Database Project มีการอัปเดตคำสั่งใหม่ในระบบ', SYSDATE, 'UNREAD');
+
+-- การแจ้งเตือนสำหรับ มารตี (67002)
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67002, 'คะแนนสอบมิดเทอมวิชา Database ออกแล้ว คุณได้ 45/50 คะแนน', SYSDATE-2, 'UNREAD');
+
+-- การแจ้งเตือนสำหรับ สมชาย (67003) และ วิไล (67004) - เรื่องการใช้งานห้องแล็บ
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67003, 'ประกาศ: ห้องแล็บ CP.01 จะปิดปรับปรุงในช่วงเย็นวันนี้', SYSDATE, 'UNREAD');
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67004, 'วิชา Database (TA02) มีการย้ายห้องเรียนไปที่ CP.05 เฉพาะสัปดาห์นี้', SYSDATE-1, 'UNREAD');
+
+-- การแจ้งเตือนสำหรับ ปิติ (67005) และ มานะ (67006) - เรื่องทุนการศึกษา
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67005, 'เปิดรับสมัครทุนการศึกษาสำหรับนักศึกษาคณะวิศวกรรมศาสตร์ประจำปี 2569', SYSDATE-3, 'UNREAD');
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67006, 'แจ้งเตือน: กำหนดการลงทะเบียนกิจกรรมปฐมนิเทศนักศึกษาใหม่', SYSDATE-5, 'READ');
+
+-- การแจ้งเตือนสำหรับ ชูใจ (67007) และ วีระ (67008) - เรื่องตารางสอบ
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67007, 'ประกาศตารางสอบปลายภาคเทอม 2/2568 อย่างเป็นทางการแล้ว', SYSDATE-1, 'UNREAD');
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67008, 'เตือน: วันสุดท้ายของการส่งเอกสารขอจบการศึกษา', SYSDATE, 'UNREAD');
+
+-- การแจ้งเตือนสำหรับ ดวงใจ (67009) และ สมศรี (67010) - เรื่องกิจกรรมคณะ
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67009, 'ขอเชิญเข้าร่วมฟังบรรยายพิเศษเรื่อง วัฒนธรรมไทยในยุคดิจิทัล', SYSDATE-2, 'UNREAD');
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67010, 'แจ้งเตือน: พรุ่งนี้มีนัดส่งงานวิชาเอกอังกฤษ (HS02) ก่อนเที่ยง', SYSDATE, 'UNREAD');
+
+-- 1. เพิ่มกิจกรรมในตาราง Event (กำหนดวันที่ให้ย้อนหลัง)
+INSERT INTO Event (EventID, EventName, EventStartDate, EventEndDate, EventType) 
+VALUES ('E101', 'กิจกรรมรับน้องสร้างสรรค์ 2568', TO_DATE('2026-01-10', 'YYYY-MM-DD'), TO_DATE('2026-01-12', 'YYYY-MM-DD'), 'Student Activity');
+
+INSERT INTO Event (EventID, EventName, EventStartDate, EventEndDate, EventType) 
+VALUES ('E102', 'อบรมพื้นฐานการใช้ Git และ GitHub', TO_DATE('2026-02-01', 'YYYY-MM-DD'), TO_DATE('2026-02-02', 'YYYY-MM-DD'), 'Academic Workshop');
+
+INSERT INTO Event (EventID, EventName, EventStartDate, EventEndDate, EventType) 
+VALUES ('E103', 'กีฬาสีภายในวิทยาลัยการคอมพิวเตอร์', TO_DATE('2026-02-15', 'YYYY-MM-DD'), TO_DATE('2026-02-16', 'YYYY-MM-DD'), 'Sports');
+
+
+-- 2. ลงทะเบียนให้นักศึกษาเข้าร่วมกิจกรรมเหล่านี้ (เพื่อให้ข้อมูลปรากฏใน View)
+-- สมมติให้ กิตติ (67001) และ มารตี (67002) เข้าร่วมกิจกรรมที่จบไปแล้ว
+INSERT INTO Register (RegID, UserID, EventID) VALUES ('R1001', 67001, 'E101');
+INSERT INTO Register (RegID, UserID, EventID) VALUES ('R1002', 67001, 'E102');
+INSERT INTO Register (RegID, UserID, EventID) VALUES ('R1003', 67002, 'E103');
+
+----------------------------------------------------------------------
+-- INSERT ข้อมูลการส่งงาน (ทำเสร็จแล้ว) จำนวน 3 รายการ
+----------------------------------------------------------------------
+
+-- 1. ปิติ (67005) ส่งงาน AI Lab 1 (ASS01)
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (205, 67005, 'ASS01', 'SUBMITTED', 88);
+
+-- 2. มานะ (67006) ส่งงาน AI Lab 1 (ASS01)
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (206, 67006, 'ASS01', 'SUBMITTED', 92);
+
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (207, 67002, 'ASS02', 'SUBMITTED', 85);
+
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (208, 67004, 'ASS01', 'SUBMITTED', 95);
+
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (209, 67007, 'ASS01', 'SUBMITTED', 87);
+
+INSERT INTO student_pending_assignments VALUES ('67005', 'ASS01', 'AI Lab 1','AI Intro','20-MAR-26', 'SUBMITTED');
 COMMIT;
+
+
