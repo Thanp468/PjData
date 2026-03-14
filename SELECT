@@ -1,0 +1,61 @@
+-- กลุ่มข้อมูลพื้นฐาน (Master Data)
+SELECT * FROM Fact;
+SELECT * FROM Major;
+SELECT * FROM Teacher;
+SELECT * FROM Subject;
+SELECT * FROM Event;
+
+-- กลุ่มผู้ใช้งานและการลงทะเบียนเรียน (Transaction Data)
+SELECT * FROM UserInfo;
+SELECT * FROM RegistrationStatus;
+SELECT * FROM TeachAssignment;
+SELECT * FROM StudyRegister;
+SELECT * FROM Register;
+
+-- กลุ่มการเรียนการสอนและการประเมิน (Academic Data)
+SELECT * FROM StdAssignment;
+SELECT * FROM AssignScore;
+SELECT * FROM Grade;
+SELECT * FROM ReviewTeacher;
+SELECT * FROM Notifications;
+
+SELECT * FROM v_student_gpa;
+SELECT * FROM student_daily_schedule;
+SELECT * FROM student_pending_assignments;
+SELECT * FROM v_student_dashboard;
+SELECT * FROM v_faculty_student_count;
+SELECT * FROM v_student_event_summary;
+SELECT * FROM v_teacher_performance_rating;
+SELECT * FROM v_event_popularity;
+SELECT * FROM v_student_feedbacks;
+SELECT * FROM v_freshmen_events_board;
+
+-- ดูรายชื่อ Procedure ทั้งหมดในระบบและสถานะ (VALID = ใช้งานได้ปกติ)
+SELECT object_name, status 
+FROM user_objects 
+WHERE object_type = 'PROCEDURE';
+
+-- ==========================================
+-- ทดสอบการทำงานของ Procedure
+-- ==========================================
+-- เปิดการแสดงผลข้อความ (ต้องรันก่อนทดสอบ)
+SET SERVEROUTPUT ON;
+
+-- 1. ทดสอบระบบดึงตารางเรียนและงานที่ค้างส่งของ UserID: 67001
+EXEC sp_get_student_alerts(67001);
+
+-- 2. ทดสอบระบบลงทะเบียนกิจกรรม (เช็กเวลาชน)
+EXEC sp_safe_event_register(67001, 'E002');
+
+-- ดูรายชื่อ Trigger ทั้งหมดว่าผูกอยู่กับตารางไหนและสถานะอะไร
+SELECT trigger_name, trigger_type, triggering_event, table_name, status 
+FROM user_triggers;
+
+-- ==========================================
+-- ทดสอบการทำงานของ Trigger (trg_score_notification)
+-- ==========================================
+-- จำลองการอัปเดตคะแนนให้นักศึกษา (ระบบควรจะสร้าง Noti อัตโนมัติ)
+UPDATE AssignScore SET PriScore = 95 WHERE ScoreAssignID = 20001;
+
+-- รันคำสั่งนี้เพื่อดูว่า Trigger ทำงานและเด้งแจ้งเตือนเข้ามาในระบบหรือไม่
+SELECT * FROM Notifications ORDER BY NotiDate DESC;
