@@ -193,18 +193,19 @@ GROUP BY u.UserID, u.UserFName, u.UserLName;
 CREATE OR REPLACE VIEW student_daily_schedule AS
 SELECT 
     u.UserID,
-    u.UserFName || ' ' || u.UserLName AS FullName,
+    CONCAT(u.UserFName, ' ', u.UserLName) AS FullName,
     s.SubjCode,
     s.SubjName,
+    CONCAT(t.TFName, ' ', t.TLName) AS TeacherName, /*  เพิ่มคอลัมน์นี้เข้ามา */
     ta.StudyDay,
-    TO_CHAR(ta.StartTime, 'HH24:MI') AS StartTime,
-    TO_CHAR(ta.EndTime, 'HH24:MI') AS EndTime,
-    EXTRACT(HOUR FROM (ta.EndTime - ta.StartTime)) AS StudyHours,
+    ta.StartTime,
+    ta.EndTime,
     ta.Room
 FROM UserInfo u
 JOIN StudyRegister sr ON u.UserID = sr.UserID
 JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
 JOIN Subject s ON ta.SubjCode = s.SubjCode
+JOIN Teacher t ON ta.TID = t.TID /*  เพิ่ม JOIN ตารางอาจารย์ */
 WHERE sr.StuRegisStatus = 'ENROLLED';
 
 CREATE OR REPLACE VIEW student_pending_assignments AS
@@ -320,24 +321,6 @@ SELECT
 FROM Event
 WHERE EventStartDate >= TRUNC(SYSDATE)
 ORDER BY EventStartDate ASC;
-
-CREATE OR REPLACE VIEW student_daily_schedule AS
-SELECT 
-    u.UserID,
-    CONCAT(u.UserFName, ' ', u.UserLName) AS FullName,
-    s.SubjCode,
-    s.SubjName,
-    CONCAT(t.TFName, ' ', t.TLName) AS TeacherName, /*  เพิ่มคอลัมน์นี้เข้ามา */
-    ta.StudyDay,
-    ta.StartTime,
-    ta.EndTime,
-    ta.Room
-FROM UserInfo u
-JOIN StudyRegister sr ON u.UserID = sr.UserID
-JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
-JOIN Subject s ON ta.SubjCode = s.SubjCode
-JOIN Teacher t ON ta.TID = t.TID /*  เพิ่ม JOIN ตารางอาจารย์ */
-WHERE sr.StuRegisStatus = 'ENROLLED';
 
 ----------------------------------------------
 --SEQUENCE & PROCEDURES
