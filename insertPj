@@ -172,3 +172,230 @@ INSERT INTO Major (MjCode, MjNameENG, MjNameTHA) VALUES('IS09', 'Tourism and Ser
 INSERT INTO Major (MjCode, MjNameENG, MjNameTHA) VALUES('IS10', 'Public Administration', 'รัฐประศาสนศาสตร์');
 INSERT INTO Major (MjCode, MjNameENG, MjNameTHA) VALUES('IS11', 'Law', 'นิติศาสตร์');
 INSERT INTO Major (MjCode, MjNameENG, MjNameTHA) VALUES('IS12', 'English for International Communication', 'ภาษาอังกฤษเพื่อการสื่อสารนานาชาติ');
+
+-- กลุ่มวิทยาศาสตร์และเทคโนโลยี
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A001', 'สมชาย', 'รักดี', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A002', 'สมศรี', 'มีสุข', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A003', 'มานะ', 'ขยันยิ่ง', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A004', 'ปิติ', 'ยินดี', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A005', 'ชูใจ', 'ใฝ่รู้', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A006', 'วิชัย', 'เก่งกาจ', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A007', 'อรวรรณ', 'งามตา', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A008', 'นพดล', 'รักษ์ไทย', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A009', 'สุชาติ', 'พัฒนา', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A010', 'วันดี', 'มีโชคชัย', 'TEC1', 'AR01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T001', 'อนุชา', 'ชาญชัย', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T002', 'ธิดา', 'ดารารัตน์', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T003', 'อภินันท์', 'มั่นคง', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T004', 'ศิริพร', 'พรประเสริฐ', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T005', 'วีระ', 'รักชาติ', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T006', 'ประเสริฐ', 'เลิศล้ำ', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T007', 'สุวิทย์', 'จิตรอารี', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T008', 'พิมพา', 'พาดวงใจ', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T009', 'กฤษดา', 'ดาราเรือง', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T010', 'นารี', 'ศรีสวัสดิ์', 'TEC2', 'TC01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E001', 'สมศักดิ์', 'ภักดีบุญ', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E002', 'สมฤดี', 'ศรีนคร', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E003', 'วิโรจน์', 'โชติช่วง', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E004', 'นันทนา', 'พาเจริญ', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E005', 'พิชัย', 'ใจสะอาด', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E006', 'อัมพร', 'สุนทรเวช', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E007', 'เอกชัย', 'ไทยรุ่งเรือง', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E008', 'จินตนา', 'พานิชย์', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E009', 'ทวี', 'ศรีทอง', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E010', 'ปราณี', 'ดีเสมอ', 'TEC3', 'EN01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S001', 'เกียรติ', 'เจริญยิ่ง', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S002', 'กัลยา', 'พาสุข', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S003', 'ณรงค์', 'พงษ์ศักดิ์', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S004', 'นลิน', 'ทิพย์มา', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S005', 'ทินกร', 'ภมรบุตร', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S006', 'บุญชัย', 'ใจสว่าง', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S007', 'พงศกร', 'พรสวรรค์', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S008', 'มารุต', 'อุตสาหะ', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S009', 'รัชนี', 'ดียิ่ง', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S010', 'ลัดดา', 'พาสวย', 'TEC4', 'SC01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R001', 'วรวุฒิ', 'วุฒิชัย', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R002', 'ศรัญญา', 'ญาณสิทธิ์', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R003', 'สถาพร', 'พรกมล', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R004', 'หทัย', 'ทิพย์โอสถ', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R005', 'อภิชาติ', 'ชาติเจริญ', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R006', 'อารีย์', 'รักสงบ', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R007', 'ชัยวัฒน์', 'วัฒนากูล', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R008', 'ธนพร', 'พรพิทักษ์', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R009', 'พัชรา', 'ราชภักดี', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R010', 'มนัส', 'สุนทรศาสตร์', 'TEC5', 'AT01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C001', 'ยุทธนา', 'นาคประสิทธิ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C002', 'ลลิตา', 'ตารักษ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C003', 'วิภาดา', 'ดาราฉาย', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C004', 'ศุภชัย', 'ชัยชนะ', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C005', 'สุรชัย', 'ชัยฤทธิ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C006', 'อลงกรณ์', 'กมลเนตร', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C007', 'กนกวรรณ', 'วรรณศรี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C008', 'ขวัญชัย', 'ชัยกมล', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C009', 'จิราพร', 'พรสถิต', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C010', 'ฉัตรชัย', 'ชัยพฤกษ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C011', 'ชลธิดา', 'ธิดารัตน์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C012', 'ญาณิศา', 'ศาตศิลป์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C013', 'ฐิติมา', 'มารศรี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C014', 'ณัฐวุฒิ', 'วุฒิศักดิ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C015', 'ดนัย', 'นัยพินิจ', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C016', 'ตระการ', 'กานต์สินี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C017', 'ถิรยุทธ์', 'ยุทธศาสตร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C018', 'ทักษิณา', 'ณาณเวช', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C019', 'ธนชัย', 'ชัยทัศน์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C020', 'นฤมล', 'มลทิน', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C021', 'บรรยง', 'ยงยุทธ', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C022', 'ประภัสสร', 'สรลักษณ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C023', 'ผกามาศ', 'มาศสุริย์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C024', 'พงษ์พันธ์', 'พันธ์พยัคฆ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C025', 'ภัทรา', 'ราเมศวร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C026', 'มงคล', 'คลจิตร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C027', 'ยลดา', 'ดาดุษฎี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C028', 'รุ่งทิวา', 'วาณิชย์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C029', 'ลดาวรรณ', 'วรรณรักษ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C030', 'วรัญญู', 'ญูประยูร', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C031', 'ศศิธร', 'ธรณิศร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C032', 'สกลพรรณ', 'พรรณวดี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C033', 'หริภัทร', 'ภัทรเวช', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C034', 'อมรา', 'ราเชนทร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C035', 'อังคณา', 'ณาณทิพย์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C036', 'กิตติพงศ์', 'พงศ์พิพัฒน์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C037', 'ขจรศักดิ์', 'ศักดิ์สิทธิ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C038', 'จันทิมา', 'มารตี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C039', 'ชยพล', 'พลากร', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C040', 'ณัฐพล', 'พลานุภาพ', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C041', 'ดุษฎี', 'ดีประเสริฐ', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C042', 'ทรงยศ', 'ยศไกร', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C043', 'ธนาธร', 'ธรณินทร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C044', 'นันทกร', 'กรภัทร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C045', 'บูรพา', 'พาทิศ', 'TEC6', 'CP01');
+
+-- กลุ่มวิทยาศาสตร์สุขภาพ
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N001', 'ปฐมพงษ์', 'พงษ์พานิช', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N002', 'พรทิพย์', 'ทิพย์มณี', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N003', 'ภานุวัตน์', 'วัตน์สิริ', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N004', 'มนตรี', 'ตรีพงษ์', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N005', 'ยศสรัล', 'รัลเมธา', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N006', 'รจนา', 'นาคปรีชา', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N007', 'ลักษมี', 'มีมงคล', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N008', 'วรพจน์', 'พจน์วิบูลย์', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N009', 'ศุภโชค', 'โชคสิริ', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N010', 'สุมิตรา', 'ตราภูมิ', 'HEL1', 'NU01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M001', 'หทัยรัตน์', 'รัตน์ใจ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M002', 'อนุสรณ์', 'สรณ์สิริ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M003', 'กฤษณา', 'ณาณุวัติ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M004', 'ขวัญเรือน', 'เรือนแก้ว', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M005', 'จักรกฤษณ์', 'กฤษณ์เมธี', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M006', 'ชลดา', 'ดารณี', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M007', 'ฐาปกรณ์', 'กรณ์กิจ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M008', 'ณัฐกานต์', 'กานต์ศิริ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M009', 'ดารัตน์', 'รัตน์มณี', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M010', 'ตฤณมุท', 'มุทิตา', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M011', 'ทิฆัมพร', 'พรหมเมศ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M012', 'ธีรยุทธ', 'ยุทธพงษ์', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M013', 'นรเศรษฐ์', 'เศรษฐาคุณ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M014', 'ปรียานุช', 'นุชนาถ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M015', 'พงศธร', 'ธรณ์เทพ', 'HEL2', 'MD01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('B001', 'ภควัต', 'วัตน์สิริกุล', 'HEL3', 'MT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('B002', 'มนทิรา', 'ราตรี', 'HEL3', 'MT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('B003', 'ยิ่งยศ', 'ยศธนา', 'HEL3', 'MT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('B004', 'รังสรรค์', 'สรรพกิจ', 'HEL3', 'MT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('B005', 'ลัดดาวัลย์', 'วัลย์ลภา', 'HEL3', 'MT01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C901', 'วิทวัส', 'วัสนานนท์', 'HEL4', 'PH01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C902', 'ศิริชัย', 'ชัยมงคล', 'HEL4', 'PH01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C903', 'สมบูรณ์', 'บูรพา', 'HEL4', 'PH01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C904', 'หิรัญ', 'รัญสิริ', 'HEL4', 'PH01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C905', 'อภิญญา', 'ญานี', 'HEL4', 'PH01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('D001', 'เกรียงไกร', 'ไกรสร', 'HEL5', 'DT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('D002', 'จารุวรรณ', 'วรรณรักษ์', 'HEL5', 'DT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('D003', 'ชัชวาล', 'วาลย์มณี', 'HEL5', 'DT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('D004', 'ญาณวุฒิ', 'วุฒิศิลป์', 'HEL5', 'DT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('D005', 'ณรงค์ฤทธิ์', 'ฤทธิ์รงค์', 'HEL5', 'DT01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('F001', 'ดุจเดือน', 'เดือนสว่าง', 'HEL6', 'PS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('F002', 'ถนอม', 'นอมจิตร', 'HEL6', 'PS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('F003', 'ทวีโชค', 'โชคอำนวย', 'HEL6', 'PS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('F004', 'ธัญญา', 'ญารัตน์', 'HEL6', 'PS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('F005', 'นพรัตน์', 'รัตน์นพ', 'HEL6', 'PS01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('G001', 'บุญญฤทธิ์', 'ฤทธิ์บุญ', 'HEL7', 'VM01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('G002', 'ปฏิภาณ', 'ภาณุมาศ', 'HEL7', 'VM01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('G003', 'พงศกร', 'กรพงศ์', 'HEL7', 'VM01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('G004', 'ภากร', 'กรเมศ', 'HEL7', 'VM01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('G005', 'มนัญญา', 'ญานิน', 'HEL7', 'VM01');
+
+-- กลุ่มมนุษยศาสตร์และสังคมศาสตร์
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('I001', 'สิทธิโชค', 'โชคสิทธิกุล', 'HUM1', 'ED01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('I002', 'เหมวิช', 'วิชยุตม์', 'HUM1', 'ED01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('I003', 'อนงค์', 'นงคราญ', 'HUM1', 'ED01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('I004', 'กมลชนก', 'ชนกนันท์', 'HUM1', 'ED01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('I005', 'จตุพล', 'พลจตุร', 'HUM1', 'ED01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('H001', 'ยงยุทธ', 'ยุทธนา', 'HUM2', 'HS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('H002', 'รุจิเรข', 'เรขารัตน์', 'HUM2', 'HS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('H003', 'ลออ', 'ออมทรัพย์', 'HUM2', 'HS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('H004', 'วสันต์', 'สันต์สิริ', 'HUM2', 'HS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('H005', 'ศราวุธ', 'วุธศิริ', 'HUM2', 'HS01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('J001', 'ชาญวิทย์', 'วิทย์ชาญ', 'HUM3', 'BS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('J002', 'ฐิติพันธ์', 'พันธ์ศิริ', 'HUM3', 'BS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('J003', 'ณภัทร', 'ภัทรวดี', 'HUM3', 'BS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('J004', 'ดิเรก', 'เรขศิลป์', 'HUM3', 'BS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('J005', 'ตวงสิทธิ์', 'สิทธิ์ตวง', 'HUM3', 'BS01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('K001', 'ทรงกลด', 'กลดทรัพย์', 'HUM4', 'FA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('K002', 'ธำรงศักดิ์', 'ศักดิ์ธำรง', 'HUM4', 'FA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('K003', 'นเรศ', 'เรศนรี', 'HUM4', 'FA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('K004', 'บวรศักดิ์', 'ศักดิ์บวร', 'HUM4', 'FA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('K005', 'ประกอบ', 'กอบเกียรติ', 'HUM4', 'FA01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('P001', 'รณภพ', 'ภพรณ', 'HUM6', 'LA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('P002', 'ลือชา', 'ชาลือ', 'HUM6', 'LA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('P003', 'วิชิต', 'ชิตชัย', 'HUM6', 'LA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('P004', 'ศักดิ์สิทธิ์', 'สิทธิ์ศักดิ์', 'HUM6', 'LA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('P005', 'สรวิชญ์', 'วิชญ์สร', 'HUM6', 'LA01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('Q001', 'หัสธนพงศ์', 'พงศ์หัส', 'HUM7', 'CO01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('Q002', 'อติรุจ', 'รุจอติ', 'HUM7', 'CO01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('Q003', 'กรกฎ', 'กฎเกณฑ์', 'HUM7', 'CO01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('Q004', 'จริยา', 'ยาจริต', 'HUM7', 'CO01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('Q005', 'ชัชพิสิฐ', 'สิฐพิชัช', 'HUM7', 'CO01');
+
+-- แมปคณะอื่นๆ เพิ่มเติมเพื่อให้ครบทุก Record ในตาราง Teacher
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('L001', 'ผลึก', 'ลึกซึ้ง', 'HUM5', 'EC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('L002', 'พิทักษ์', 'ทักษิณ', 'HUM5', 'EC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('L003', 'ภูผา', 'ผาภูมิ', 'HUM5', 'EC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('L004', 'มณฑล', 'ทลรักษ์', 'HUM5', 'EC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('L005', 'ยอดเยี่ยม', 'เยี่ยมยุทธ', 'HUM5', 'EC01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('U001', 'ญาดา', 'ดาราญา', 'HUM8', 'MB01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('U002', 'ณัชชา', 'ชาณัช', 'HUM8', 'MB01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('U003', 'ดรุณี', 'ณีดรุณ', 'HUM8', 'MB01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('U004', 'ตรีมูรติ', 'รติตรี', 'HUM8', 'MB01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('U005', 'ถาวร', 'วรช่าง', 'HUM8', 'MB01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V001', 'ทัศนีย์', 'นีย์ทัศน์', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V002', 'ธัชกร', 'กรธัช', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V003', 'นรินทร์', 'รินทร์นรี', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V004', 'บดินทร์', 'ทร์บดิน', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V005', 'ปรารถนา', 'นาปรารถ', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V006', 'พรรณราย', 'รายพรรณ', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V007', 'ภัทรวรรณ', 'วรรณภัทร', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V008', 'มยุรี', 'รีมยุ', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V009', 'ยุพเรศ', 'เรศยุพ', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V010', 'รจเรข', 'เรขรจ', 'COl1', 'IC01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('W001', 'ลลนา', 'นาลล', 'COl2', 'IS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('W002', 'วรางคณา', 'ณาณวราง', 'COl2', 'IS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('W003', 'ศศิวิมล', 'มลศศิ', 'COl2', 'IS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('W004', 'สโรชา', 'ชาสโร', 'COl2', 'IS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('W005', 'หทัยทิพย์', 'ทิพย์หทัย', 'COl2', 'IS01');
