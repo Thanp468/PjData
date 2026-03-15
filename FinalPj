@@ -1,0 +1,1133 @@
+--DROP
+----------------------------------------------
+-- DROP VIEWS
+DROP VIEW v_student_dashboard;
+DROP VIEW student_pending_assignments;
+DROP VIEW student_daily_schedule;
+DROP VIEW v_student_gpa;
+DROP VIEW v_faculty_student_count;
+DROP VIEW v_student_event_summary;
+DROP VIEW v_teacher_performance_rating;
+DROP VIEW v_event_popularity;
+DROP VIEW v_student_feedbacks;
+DROP VIEW v_freshmen_events_board;
+
+-- DROP SEQUENCE
+DROP SEQUENCE seq_reg_id;
+
+-- DROP TABLES
+DROP TABLE RegistrationStatus CASCADE CONSTRAINTS;
+DROP TABLE Notifications CASCADE CONSTRAINTS;
+DROP TABLE ReviewTeacher CASCADE CONSTRAINTS;
+DROP TABLE AssignScore CASCADE CONSTRAINTS;
+DROP TABLE Grade CASCADE CONSTRAINTS;
+DROP TABLE Register CASCADE CONSTRAINTS;
+DROP TABLE StudyRegister CASCADE CONSTRAINTS;
+DROP TABLE StdAssignment CASCADE CONSTRAINTS;
+DROP TABLE TeachAssignment CASCADE CONSTRAINTS;
+DROP TABLE UserInfo CASCADE CONSTRAINTS;
+DROP TABLE Subject CASCADE CONSTRAINTS;
+DROP TABLE Major CASCADE CONSTRAINTS;
+DROP TABLE Event CASCADE CONSTRAINTS;
+DROP TABLE Teacher CASCADE CONSTRAINTS;
+DROP TABLE Fact CASCADE CONSTRAINTS;
+
+----------------------------------------------
+--TABLES
+CREATE TABLE Fact(
+    FCode       VARCHAR2(4) PRIMARY KEY,
+    FNameENG    VARCHAR2(256),
+    FNameTHA    VARCHAR2(256)
+);
+
+CREATE TABLE Major(
+    MjCode      VARCHAR2(4) PRIMARY KEY,
+    MjNameENG   VARCHAR2(256),
+    MjNameTHA   VARCHAR2(256),
+    FCode       VARCHAR2(4),
+    CONSTRAINT Major_fk_Fact FOREIGN KEY (FCode) REFERENCES Fact(FCode)
+);
+
+CREATE TABLE Teacher(
+    TID         VARCHAR2(4) PRIMARY KEY,
+    TFName      VARCHAR2(50),
+    TLName      VARCHAR2(50),
+    FCode       VARCHAR2(4),
+    MjCode      VARCHAR2(4),
+    CONSTRAINT Teacher_fk_Fact FOREIGN KEY (FCode) REFERENCES Fact(FCode),
+    CONSTRAINT Teacher_fk_Major FOREIGN KEY (MjCode) REFERENCES Major(MjCode)
+);
+
+CREATE TABLE Event(
+    EventID         VARCHAR2(4) PRIMARY KEY,
+    EventName       VARCHAR2(150),
+    EventStartDate  DATE,
+    EventEndDate    DATE,
+    EventType       VARCHAR2(50)
+);
+
+CREATE TABLE UserInfo(
+    UserID      NUMBER(5) PRIMARY KEY,
+    UserFName   VARCHAR2(50),
+    UserLName   VARCHAR2(50),
+    UserEmail   VARCHAR2(100),
+    UserPass    VARCHAR2(100),
+    FCode       VARCHAR2(4),
+    MjCode      VARCHAR2(4),
+    UserType    VARCHAR2(5),
+    CONSTRAINT UserInfo_fk_Fact FOREIGN KEY (FCode) REFERENCES Fact(FCode),
+    CONSTRAINT UserInfo_fk_Major FOREIGN KEY (MjCode) REFERENCES Major(MjCode)
+);
+
+CREATE TABLE Subject(
+    SubjCode    VARCHAR2(8) PRIMARY KEY,
+    SubjName    VARCHAR2(100),
+    SubjCredit  NUMBER(2),
+    FCode       VARCHAR2(4),
+    SubjType    VARCHAR2(150),
+    CONSTRAINT Subject_fk_fact FOREIGN KEY(FCode) REFERENCES Fact(FCode)
+);
+
+CREATE TABLE Register(
+    RegID       VARCHAR2(10) PRIMARY KEY,
+    UserID      NUMBER(5),
+    EventID     VARCHAR2(4),
+    CONSTRAINT Register_fk_UserInfo FOREIGN KEY(UserID) REFERENCES UserInfo(UserID),
+    CONSTRAINT Register_fk_Event FOREIGN KEY(EventID) REFERENCES Event(EventID)
+);
+
+CREATE TABLE StdAssignment(
+    AssignID    VARCHAR2(10) PRIMARY KEY,
+    SubjCode    VARCHAR2(8),
+    AssName     VARCHAR2(150),
+    Dateline    DATE,
+    Score       NUMBER(3),
+    CONSTRAINT StdAssignment_fk_Subject FOREIGN KEY (SubjCode) REFERENCES Subject(SubjCode)
+);
+
+CREATE TABLE TeachAssignment(
+    TAssignID  VARCHAR2(5) PRIMARY KEY,
+    TID        VARCHAR2(4),
+    SubjCode   VARCHAR2(8),
+    Year       NUMBER(4),
+    Semester   NUMBER(1),
+    StudyDay   VARCHAR2(10),
+    StartTime  TIMESTAMP,   -- ??????????? TIMESTAMP
+    EndTime    TIMESTAMP,   -- ??????????? TIMESTAMP
+    Room       VARCHAR2(20),
+    CONSTRAINT chk_study_day CHECK (StudyDay IN ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY')),
+    CONSTRAINT chk_time_logic CHECK (EndTime > StartTime), -- ?????????????????????!
+    CONSTRAINT TeachAssignment_fk_Teacher FOREIGN KEY (TID) REFERENCES Teacher(TID),
+    CONSTRAINT TeachAssignment_fk_SubjCode FOREIGN KEY (SubjCode) REFERENCES Subject(SubjCode)
+);
+
+CREATE TABLE StudyRegister(
+    StuRegisID      NUMBER(5) PRIMARY KEY, 
+    TAssignID       VARCHAR2(5),
+    UserID          NUMBER(5),
+    Section         NUMBER(3), 
+    StuRegisStatus  VARCHAR2(15),
+    CONSTRAINT StudyRegister_fk_TeachAssignment FOREIGN KEY (TAssignID) REFERENCES TeachAssignment(TAssignID),
+    CONSTRAINT StudyRegister_fk_UserInfo FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
+);
+
+CREATE TABLE Grade(
+    GradeCode   NUMBER(5) PRIMARY KEY,
+    StuRegisID  NUMBER(5),
+    GradeResult VARCHAR2(2),
+    CONSTRAINT Grade_fk_StudyRegister FOREIGN KEY(StuRegisID) REFERENCES StudyRegister(StuRegisID)
+);
+
+CREATE TABLE AssignScore(
+    ScoreAssignID NUMBER(6) PRIMARY KEY,
+    UserID        NUMBER(5),
+    AssignID      VARCHAR2(10),
+    Status        VARCHAR2(15),
+    PriScore      NUMBER(3),
+    CONSTRAINT AssignScore_fk_UserInfo FOREIGN KEY(UserID) REFERENCES UserInfo(UserID),
+    CONSTRAINT AssignScore_fk_StdAssignment FOREIGN KEY(AssignID) REFERENCES StdAssignment(AssignID)
+);
+
+CREATE TABLE ReviewTeacher(
+    TeachReview NUMBER(8) PRIMARY KEY,
+    TAssignID   VARCHAR2(5),
+    UserID      NUMBER(5),
+    UserReviewT VARCHAR2(500),
+    UserRateT   NUMBER(1),
+    CONSTRAINT chk_review_rate CHECK (UserRateT BETWEEN 1 AND 5),
+    CONSTRAINT ReviewTeacher_fk_TeachAssign FOREIGN KEY (TAssignID) REFERENCES TeachAssignment(TAssignID),
+    CONSTRAINT ReviewTeacher_fk_UserInfo FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
+);
+
+CREATE TABLE Notifications (
+    NotiID      NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    UserID      NUMBER(5),
+    Message     VARCHAR2(500),
+    NotiDate    DATE DEFAULT SYSDATE,
+    Status      VARCHAR2(10) DEFAULT 'UNREAD',
+    CONSTRAINT Noti_fk_User FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
+);
+
+CREATE TABLE RegistrationStatus (
+    UserID NUMBER(5) PRIMARY KEY,
+    Status VARCHAR2(20),
+    CONSTRAINT RegStatus_fk_User FOREIGN KEY (UserID) REFERENCES UserInfo(UserID)
+);
+------------------------------------------------
+-- 3. VIEWS
+
+CREATE OR REPLACE VIEW v_student_gpa AS
+SELECT 
+    u.UserID,
+    u.UserFName || ' ' || u.UserLName AS FullName,
+    ROUND(SUM(
+        CASE g.GradeResult
+            WHEN 'A'  THEN 4.0
+            WHEN 'B+' THEN 3.5
+            WHEN 'B'  THEN 3.0
+            WHEN 'C+' THEN 2.5
+            WHEN 'C'  THEN 2.0
+            WHEN 'D+' THEN 1.5
+            WHEN 'D'  THEN 1.0
+            WHEN 'F'  THEN 0.0
+            ELSE 0.0
+        END * s.SubjCredit
+    ) / NULLIF(SUM(s.SubjCredit), 0), 2) AS GPAX
+FROM Grade g
+JOIN StudyRegister sr ON g.StuRegisID = sr.StuRegisID
+JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
+JOIN Subject s ON ta.SubjCode = s.SubjCode
+JOIN UserInfo u ON sr.UserID = u.UserID
+GROUP BY u.UserID, u.UserFName, u.UserLName;
+
+CREATE OR REPLACE VIEW student_daily_schedule AS
+SELECT 
+    u.UserID,
+    CONCAT(CONCAT(u.UserFName, ' '), u.UserLName) AS FullName, 
+    s.SubjCode,
+    s.SubjName,
+    CONCAT(CONCAT(t.TFName, ' '), t.TLName) AS TeacherName,
+    ta.StudyDay,
+    ta.StartTime,
+    ta.EndTime,
+    ta.Room
+FROM UserInfo u
+JOIN StudyRegister sr ON u.UserID = sr.UserID
+JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
+JOIN Subject s ON ta.SubjCode = s.SubjCode
+JOIN Teacher t ON ta.TID = t.TID 
+WHERE sr.StuRegisStatus = 'ENROLLED';
+
+CREATE OR REPLACE VIEW student_pending_assignments AS
+SELECT 
+    sr.UserID,
+    sa.AssignID,
+    sa.AssName,
+    s.SubjName,
+    sa.Dateline,
+    NVL(ans.Status, 'NOT SUBMITTED') as CurrentStatus
+FROM StudyRegister sr
+JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
+JOIN Subject s ON ta.SubjCode = s.SubjCode
+JOIN StdAssignment sa ON s.SubjCode = sa.SubjCode
+LEFT JOIN AssignScore ans ON sr.UserID = ans.UserID AND sa.AssignID = ans.AssignID
+WHERE (ans.Status IS NULL OR ans.Status != 'SUBMITTED')
+  AND sa.Dateline >= TRUNC(SYSDATE);
+
+CREATE OR REPLACE VIEW v_student_dashboard AS
+SELECT 
+    n.UserID,
+    n.Message AS Notification,
+    n.NotiDate,
+    n.Status AS ReadStatus,
+    'ALERT' AS Type
+FROM Notifications n
+UNION ALL
+SELECT 
+    UserID,
+    'งานค้างส่ง: ' || AssName || ' (วิชา ' || SubjName || ')',
+    Dateline,
+    CurrentStatus,
+    'PENDING_TASK' AS Type
+FROM student_pending_assignments;
+
+
+CREATE OR REPLACE VIEW v_faculty_student_count AS
+SELECT 
+    f.FCode,
+    f.FNameENG AS FacultyName,
+    m.MjNameENG AS MajorName,
+    COUNT(u.UserID) AS TotalStudents
+FROM Fact f
+JOIN Major m ON f.FCode = m.FCode
+LEFT JOIN UserInfo u ON m.MjCode = u.MjCode
+WHERE u.UserType = 'STD' OR u.UserID IS NULL
+GROUP BY f.FCode, f.FNameENG, m.MjNameENG
+ORDER BY f.FCode, m.MjNameENG;
+
+CREATE OR REPLACE VIEW v_student_event_summary AS
+SELECT 
+    u.UserID,
+    u.UserFName || ' ' || u.UserLName AS FullName,
+    e.EventName,
+    e.EventStartDate,
+    e.EventEndDate,
+    e.EventType,
+    CASE 
+        WHEN e.EventEndDate < TRUNC(SYSDATE) THEN 'FINISHED'
+        WHEN e.EventStartDate <= TRUNC(SYSDATE) AND e.EventEndDate >= TRUNC(SYSDATE) THEN 'ONGOING'
+        ELSE 'UPCOMING'
+    END AS EventStatus
+FROM UserInfo u
+JOIN Register r ON u.UserID = r.UserID
+JOIN Event e ON r.EventID = e.EventID;
+        
+CREATE OR REPLACE VIEW v_teacher_performance_rating AS
+SELECT 
+    t.TID,
+    t.TFName || ' ' || t.TLName AS TeacherName,
+    s.SubjCode,
+    s.SubjName,
+    COUNT(rt.TeachReview) AS TotalReviews,
+    ROUND(AVG(rt.UserRateT), 2) AS AverageRating
+FROM Teacher t
+JOIN TeachAssignment ta ON t.TID = ta.TID
+JOIN Subject s ON ta.SubjCode = s.SubjCode
+LEFT JOIN ReviewTeacher rt ON ta.TAssignID = rt.TAssignID
+GROUP BY t.TID, t.TFName, t.TLName, s.SubjCode, s.SubjName;
+
+CREATE OR REPLACE VIEW v_event_popularity AS
+SELECT 
+    e.EventID,
+    e.EventName,
+    e.EventType,
+    e.EventStartDate,
+    COUNT(r.RegID) AS TotalParticipants
+FROM Event e
+LEFT JOIN Register r ON e.EventID = r.EventID
+GROUP BY e.EventID, e.EventName, e.EventType, e.EventStartDate
+ORDER BY TotalParticipants DESC;
+
+CREATE OR REPLACE VIEW v_student_feedbacks AS
+SELECT 
+    t.TFName || ' ' || t.TLName AS TeacherName,
+    s.SubjCode,
+    s.SubjName,
+    rt.UserRateT AS StarRating,
+    rt.UserReviewT AS ReviewComment
+FROM ReviewTeacher rt
+JOIN TeachAssignment ta ON rt.TAssignID = ta.TAssignID
+JOIN Subject s ON ta.SubjCode = s.SubjCode
+JOIN Teacher t ON ta.TID = t.TID
+ORDER BY rt.TeachReview DESC;
+
+CREATE OR REPLACE VIEW v_freshmen_events_board AS
+SELECT 
+    EventID,
+    EventName,
+    EventType,
+    EventStartDate,
+    EventEndDate,
+    EventEndDate - TRUNC(SYSDATE) AS Days_Remaining
+FROM Event
+WHERE EventStartDate >= TRUNC(SYSDATE)
+ORDER BY EventStartDate ASC;
+
+----------------------------------------------
+--SEQUENCE & PROCEDURES
+CREATE SEQUENCE seq_reg_id START WITH 2 INCREMENT BY 1;
+
+CREATE OR REPLACE PROCEDURE sp_get_student_alerts (
+    p_user_id IN NUMBER
+) AS
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('--- Daily Schedule ---');
+    FOR rec IN (
+        SELECT * FROM student_daily_schedule 
+        WHERE UserID = p_user_id 
+          AND StudyDay = TRIM(UPPER(TO_CHAR(SYSDATE, 'FMDAY', 'NLS_DATE_LANGUAGE=AMERICAN')))
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE('Class: ' || rec.SubjName || ' at ' || rec.StartTime || ' Room: ' || rec.Room);
+    END LOOP;
+
+    DBMS_OUTPUT.PUT_LINE('--- Pending Assignments ---');
+    FOR rec IN (SELECT * FROM student_pending_assignments WHERE UserID = p_user_id) LOOP
+        DBMS_OUTPUT.PUT_LINE('Task: ' || rec.AssName || ' | Deadline: ' || TO_CHAR(rec.Dateline, 'DD-MON-YYYY'));
+    END LOOP;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE sp_safe_event_register (
+    p_user_id IN NUMBER,
+    p_event_id IN VARCHAR2
+) AS
+    v_conflict_count NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_conflict_count
+    FROM student_daily_schedule v
+    JOIN Event e ON e.EventID = p_event_id
+    WHERE v.UserID = p_user_id 
+      AND v.StudyDay = TRIM(UPPER(TO_CHAR(e.EventStartDate, 'FMDAY', 'NLS_DATE_LANGUAGE=AMERICAN')));
+
+    IF v_conflict_count > 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Warning: This event conflicts with your class schedule!');
+    ELSE
+        INSERT INTO Register (RegID, UserID, EventID) 
+        VALUES ('R'||LPAD(seq_reg_id.NEXTVAL, 4, '0'), p_user_id, p_event_id);
+        COMMIT;
+        DBMS_OUTPUT.PUT_LINE('Registration Successful.');
+    END IF;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE sp_user_register (
+    p_id IN NUMBER,
+    p_fname IN VARCHAR2,
+    p_lname IN VARCHAR2,
+    p_email IN VARCHAR2,
+    p_pass IN VARCHAR2,
+    p_fcode IN VARCHAR2,
+    p_mjcode IN VARCHAR2
+) AS
+BEGIN
+    INSERT INTO UserInfo (UserID, UserFName, UserLName, UserEmail, UserPass, FCode, MjCode, UserType)
+    VALUES (p_id, p_fname, p_lname, p_email, p_pass, p_fcode, p_mjcode, 'STD');
+    COMMIT;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE sp_user_login (
+    p_email IN VARCHAR2,
+    p_pass IN VARCHAR2,
+    p_status OUT VARCHAR2
+) AS
+    v_count NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_count 
+    FROM UserInfo 
+    WHERE UserEmail = p_email AND UserPass = p_pass;
+
+    IF v_count > 0 THEN
+        p_status := 'SUCCESS';
+    ELSE
+        p_status := 'FAILED';
+    END IF;
+END;
+/
+
+------------------------------------------------------------
+--TRIGGERS
+CREATE OR REPLACE TRIGGER trg_score_notification
+AFTER UPDATE OF PriScore ON AssignScore
+FOR EACH ROW
+BEGIN
+    INSERT INTO Notifications (UserID, Message, NotiDate)
+    VALUES (:NEW.UserID, 'ประกาศคะแนน: งาน ' || :NEW.AssignID || ' ตรวจเสร็จแล้ว! คุณได้ ' || :NEW.PriScore || ' คะแนน', SYSDATE);
+    
+    DBMS_OUTPUT.PUT_LINE('Notification sent to UserID: ' || :NEW.UserID);
+END;
+/
+
+CREATE OR REPLACE TRIGGER trg_new_assignment_notification
+AFTER INSERT ON StdAssignment
+FOR EACH ROW
+BEGIN
+    INSERT INTO Notifications (UserID, Message)
+    SELECT sr.UserID, 'มีงานใหม่: ' || :NEW.AssName || ' (วิชา ' || :NEW.SubjCode || ') กำหนดส่ง ' || TO_CHAR(:NEW.Dateline, 'DD/MM/YYYY')
+    FROM StudyRegister sr
+    JOIN TeachAssignment ta ON sr.TAssignID = ta.TAssignID
+    WHERE ta.SubjCode = :NEW.SubjCode 
+      AND sr.StuRegisStatus = 'ENROLLED';
+END;
+/
+
+-----------------------------------------------
+--TEST INSERT
+-----------------------------------------------
+--TEST INSERT
+INSERT INTO Event (EventID, EventName, EventStartDate, EventEndDate, EventType) 
+VALUES ('E001', 'Freshman Orientation', TO_DATE('2026-06-01', 'YYYY-MM-DD'), TO_DATE('2026-06-01', 'YYYY-MM-DD'), 'Academic');
+
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('F001', 'Science', 'Science');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('M001', 'Computer Science', 'Computer Science', 'F001');
+
+INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) 
+VALUES ('CP101001', 'Introduction to AI', 3, 'F001', 'Core Course');
+INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) 
+VALUES ('CP101002', 'Database Systems', 3, 'F001', 'Core Course');
+
+-- ??? INSERT Teacher ???????????? FCode, MjCode
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES ('T001', 'Obi-Wan', 'Kenobi', 'F001', 'M001');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES ('T002', 'Yoda', 'Master', 'F001', 'M001');
+
+INSERT INTO UserInfo (UserID, UserFName, UserLName, UserEmail, UserPass, FCode, MjCode, UserType) 
+VALUES (67001, 'Anakin', 'Skywalker', 'anakin@kku.ac.th', 'pass123', 'F001', 'M001', 'STD');
+
+-- ??? INSERT TeachAssignment ?????????????? TO_TIMESTAMP
+INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
+VALUES ('TA001', 'T001', 'CP101001', 2026, 1, 'MONDAY', TO_TIMESTAMP('09:00', 'HH24:MI'), TO_TIMESTAMP('12:00', 'HH24:MI'), 'CP.01');
+INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
+VALUES ('TA002', 'T002', 'CP101002', 2026, 1, 'WEDNESDAY', TO_TIMESTAMP('13:00', 'HH24:MI'), TO_TIMESTAMP('16:00', 'HH24:MI'), 'CP.02');
+
+INSERT INTO StudyRegister (StuRegisID, TAssignID, UserID, Section, StuRegisStatus) 
+VALUES (10001, 'TA001', 67001, 1, 'ENROLLED');
+INSERT INTO StudyRegister (StuRegisID, TAssignID, UserID, Section, StuRegisStatus) 
+VALUES (10002, 'TA002', 67001, 1, 'ENROLLED');
+
+INSERT INTO Register (RegID, UserID, EventID) 
+VALUES ('R0001', 67001, 'E001');
+
+INSERT INTO StdAssignment (AssignID, SubjCode, AssName, Dateline, Score) 
+VALUES ('ASS00001', 'CP101001', 'Neural Network Lab', TO_DATE('2026-03-15', 'YYYY-MM-DD'), 100);
+
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (20001, 67001, 'ASS00001', 'SUBMITTED', 85);
+
+INSERT INTO Grade (GradeCode, StuRegisID, GradeResult) 
+VALUES (30001, 10001, 'B+');
+
+-- ??? INSERT ReviewTeacher ????????????????? TAssignID ???? (????????????????)
+INSERT INTO ReviewTeacher (TeachReview, TAssignID, UserID, UserReviewT, UserRateT) 
+VALUES (40001, 'TA001', 67001, 'Good material and clear explanation.', 5);
+
+UPDATE AssignScore SET PriScore = 95 WHERE ScoreAssignID = 20001;
+SELECT * FROM Notifications;
+
+COMMIT;
+
+-----------------------------------------------
+--TEST QUERIES
+SELECT * FROM v_student_gpa;
+
+INSERT INTO StdAssignment (AssignID, SubjCode, AssName, Dateline, Score) 
+VALUES ('ASS999', 'CP101002', 'SQL Project Design', TO_DATE('2026-04-01', 'YYYY-MM-DD'), 50);
+
+SELECT * FROM Notifications ORDER BY NotiDate DESC;
+
+SELECT * FROM v_student_dashboard;
+
+SET SERVEROUTPUT ON;
+EXEC sp_safe_event_register(67001, 'E001');
+
+-- ข้อมูลคณะ (Fact)
+---------------------------------------------------------------------------------------
+-- กลุ่มวิทยาศาสตร์และเทคโนโลยี
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('TEC1', 'Faculty of Agriculture', 'คณะเกษตรศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('TEC2', 'Faculty of Technology', 'คณะเทคโนโลยี');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('TEC3', 'Faculty of Engineering', 'คณะวิศวกรรมศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('TEC4', 'Faculty of Science', 'คณะวิทยาศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('TEC5', 'Faculty of Architecture', 'คณะสถาปัตยกรรมศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('TEC6', 'College of Computing', 'วิทยาลัยการคอมพิวเตอร์');
+
+-- กลุ่มวิทยาศาสตร์สุขภาพ
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HEL1', 'Faculty of Nursing', 'คณะพยาบาลศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HEL2', 'Faculty of Medicine', 'คณะแพทยศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HEL3', 'Faculty of Associated Medical Sciences', 'คณะเทคนิคการแพทย์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HEL4', 'Faculty of Public Health', 'คณะสาธารณสุขศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HEL5', 'Faculty of Dentistry', 'คณะทันตแพทยศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HEL6', 'Faculty of Pharmaceutical Sciences', 'คณะเภสัชศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HEL7', 'Faculty of Veterinary Medicine', 'คณะสัตวแพทยศาสตร์');
+
+-- กลุ่มมนุษยศาสตร์และสังคมศาสตร์
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HUM1', 'Faculty of Education', 'คณะศึกษาศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HUM2', 'Faculty of Humanities and Social Sciences', 'คณะมนุษยศาสตร์และสังคมศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HUM3', 'Khon Kaen University Business School (KKBS)', 'คณะบริหารธุรกิจและการบัญชี');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HUM4', 'Faculty of Fine and Applied Arts', 'คณะศิลปกรรมศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HUM5', 'Faculty of Economics', 'คณะเศรษฐศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HUM6', 'Faculty of Law', 'คณะนิติศาสตร์');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HUM7', 'College of Local Administration (COLA)', 'วิทยาลัยการปกครองท้องถิ่น');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('HUM8', 'College of Graduate Study In Management (MBA)', 'วิทยาลัยบัณฑิตศึกษาการจัดการ');
+
+-- กลุ่มวิทยาลัยและวิทยาเขต
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('COl1', 'International College (IC)', 'วิทยาลัยนานาชาติ');
+INSERT INTO Fact (FCode, FNameENG, FNameTHA) VALUES ('COl2', 'Faculty of Interdisciplinary Studies', 'คณะสหวิทยาการ');
+
+---------------------------------------------------------------------------------------
+-- ข้อมูลสาขาวิชา (Major)
+---------------------------------------------------------------------------------------
+-- คณะเกษตรศาสตร์ (TEC1)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('AR01', 'Agriculture', 'เกษตรศาสตร์', 'TEC1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('AR02', 'Agricultural Economics', 'เศรษฐศาสตร์การเกษตร', 'TEC1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('AR03', 'Fisheries', 'ประมง', 'TEC1');
+
+-- คณะเทคโนโลยี (TEC2)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('TC01', 'Food Technology', 'เทคโนโลยีการอาหาร', 'TEC2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('TC02', 'Biotechnology', 'เทคโนโลยีชีวภาพ', 'TEC2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('TC03', 'Geotechnology', 'เทคโนโลยีธรณี', 'TEC2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('TC04', 'Agro-Industrial Management', 'การจัดการอุตสาหกรรมเกษตร', 'TEC2');
+
+-- คณะวิศวกรรมศาสตร์ (TEC3)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN01', 'Civil Engineering', 'วิศวกรรมโยธา', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN02', 'Electrical Engineering', 'วิศวกรรมไฟฟ้า', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN03', 'Mechanical Engineering', 'วิศวกรรมเครื่องกล', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN04', 'Industrial Engineering', 'วิศวกรรมอุตสาหการ', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN05', 'Chemical Engineering', 'วิศวกรรมเคมี', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN06', 'Environmental Engineering', 'วิศวกรรมสิ่งแวดล้อม', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN07', 'Computer Engineering', 'วิศวกรรมคอมพิวเตอร์', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN08', 'Telecommunication Engineering', 'วิศวกรรมโทรคมนาคม', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN09', 'Automation, Robotics and IoT Engineering', 'วิศวกรรมระบบอัตโนมัติ หุ่นยนต์ และไอโอที', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN10', 'Chemical Engineering (International Program)', 'วิศวกรรมเคมี (นานาชาติ)', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN11', 'Digital Media Engineering (International Program)', 'วิศวกรรมสื่อดิจิทัล (นานาชาติ)', 'TEC3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('EN12', 'Logistics Engineering (International Program)', 'วิศวกรรมโลจิสติกส์ (นานาชาติ)', 'TEC3');
+
+-- คณะวิทยาศาสตร์ (TEC4)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC01', 'Mathematics', 'คณิตศาสตร์', 'TEC4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC02', 'Statistics', 'สถิติ', 'TEC4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC03', 'Statistical Information', 'สารสนเทศสถิติ', 'TEC4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC04', 'Physics', 'ฟิสิกส์', 'TEC4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC05', 'Materials Science and Nanotechnology', 'วัสดุศาสตร์และนาโนเทคโนโลยี', 'TEC4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC06', 'Chemistry', 'เคมี', 'TEC4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC07', 'Applied Analytical and Inorganic Chemistry', 'เคมีวิเคราะห์และอนินทรีย์ประยุกต์', 'TEC4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC08', 'Biology', 'ชีววิทยา', 'TEC4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC09', 'Microbiology', 'จุลชีววิทยา', 'TEC4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC10', 'Biochemistry', 'ชีวเคมี', 'TEC4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('SC11', 'Environmental Science', 'วิทยาศาสตร์สิ่งแวดล้อม', 'TEC4');
+
+-- คณะสถาปัตยกรรมศาสตร์ (TEC5)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('AT01', 'Product Design', 'การออกแบบผลิตภัณฑ์', 'TEC5');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('AT02', 'Graphic and Instructional Media Design', 'การออกแบบนิเทศศิลป์', 'TEC5');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('AT03', 'Interior Design', 'การออกแบบตกแต่งภายใน', 'TEC5');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('AT04', 'Ceramics Design', 'การออกแบบเซรามิกส์', 'TEC5');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('AT05', 'Textile and Fashion Design', 'การออกแบบสิ่งทอและแฟชั่น', 'TEC5');
+
+-- วิทยาลัยการคอมพิวเตอร์ (TEC6)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('CP01', 'Artificial Intelligence', 'ปัญญาประดิษฐ์', 'TEC6');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('CP02', 'Computer Science', 'วิทยาการคอมพิวเตอร์', 'TEC6');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('CP03', 'Information Technology', 'เทคโนโลยีสารสนเทศ', 'TEC6');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('CP04', 'Geoinformatics', 'ภูมิสารสนเทศศาสตร์', 'TEC6');
+
+-- คณะพยาบาลศาสตร์ (HEL1)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('NU01', 'Nursing Science', 'พยาบาลศาสตร์', 'HEL1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('NU02', 'Nursing Science (International Program)', 'พยาบาลศาสตร์ (นานาชาติ)', 'HEL1');
+
+-- คณะแพทยศาสตร์ (HEL2)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('MD01', 'Doctor of Medicine', 'แพทยศาสตร์', 'HEL2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('MD02', 'Medical Records', 'เวชระเบียน', 'HEL2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('MD03', 'Radiologic Technology', 'รังสีเทคนิค', 'HEL2');
+
+-- คณะเทคนิคการแพทย์ (HEL3)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('MT01', 'Medical Technology', 'เทคนิคการแพทย์', 'HEL3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('MT02', 'Physical Therapy', 'กายภาพบำบัด', 'HEL3');
+
+-- คณะสาธารณสุขศาสตร์ (HEL4)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('PH01', 'Community Public Health', 'สาธารณสุขชุมชน', 'HEL4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('PH02', 'Environmental Health', 'อนามัยสิ่งแวดล้อม', 'HEL4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('PH03', 'Occupational Health and Safety', 'อาชีวอนามัยและความปลอดภัย', 'HEL4');
+
+-- คณะทันตแพทยศาสตร์ (HEL5)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('DT01', 'Doctor of Dental Surgery', 'ทันตแพทยศาสตร์', 'HEL5');
+
+-- คณะเภสัชศาสตร์ (HEL6)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('PS01', 'Pharmaceutical Sciences', 'เภสัชศาสตร์', 'HEL6');
+
+-- คณะสัตวแพทยศาสตร์ (HEL7)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('VM01', 'Doctor of Veterinary Medicine', 'สัตวแพทยศาสตร์', 'HEL7');
+
+-- คณะศึกษาศาสตร์ (HUM1)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('ED01', 'Teaching Thai', 'การสอนภาษาไทย', 'HUM1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('ED02', 'Teaching English', 'การสอนภาษาอังกฤษ', 'HUM1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('ED03', 'Mathematics Education', 'คณิตศาสตร์ศึกษา', 'HUM1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('ED04', 'Science Education', 'วิทยาศาสตร์ศึกษา', 'HUM1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('ED05', 'Social Studies Education', 'สังคมศึกษา', 'HUM1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('ED06', 'Art Education', 'ศิลปศึกษา', 'HUM1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('ED07', 'Physical Education', 'พลศึกษา', 'HUM1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('ED08', 'Early Childhood Education', 'การศึกษาปฐมวัย', 'HUM1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('ED09', 'Computer Education', 'คอมพิวเตอร์ศึกษา', 'HUM1');
+
+-- คณะมนุษยศาสตร์และสังคมศาสตร์ (HUM2)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES ('HS01', 'Thai Language', 'ภาษาไทย', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS02', 'English', 'ภาษาอังกฤษ', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS03', 'Japanese', 'ภาษาญี่ปุ่น', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS04', 'Chinese', 'ภาษาจีน', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS05', 'French', 'ภาษาฝรั่งเศส', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS06', 'German', 'ภาษาเยอรมัน', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS07', 'Spanish', 'ภาษาสเปน', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS08', 'Sociology and Anthropology', 'สังคมวิทยาและมานุษยวิทยา', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS09', 'Social Development', 'การพัฒนาสังคม', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS10', 'Southeast Asian Studies', 'เอเชียตะวันออกเฉียงใต้ศึกษา', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS11', 'Public Administration', 'รัฐประศาสนศาสตร์', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS12', 'Information Studies', 'สารสนเทศศึกษา', 'HUM2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('HS13', 'Southwest Asian Studies', 'เอเชียตะวันตกเฉียงใต้ศึกษา', 'HUM2');
+
+-- คณะบริหารธุรกิจและการบัญชี (HUM3)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('BS01', 'Accountancy', 'บัญชี', 'HUM3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('BS02', 'Finance', 'การเงิน', 'HUM3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('BS03', 'Marketing', 'การตลาด', 'HUM3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('BS04', 'Logistics Management', 'การจัดการโลจิสติกส์', 'HUM3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('BS05', 'Tourism Management', 'การจัดการการท่องเที่ยว', 'HUM3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('BS06', 'Service Business and Event Management', 'การจัดการธุรกิจบริการและอีเวนต์', 'HUM3');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('BS07', 'Digital Entrepreneurship Management', 'การจัดการความเป็นผู้ประกอบการดิจิทัล', 'HUM3');
+
+-- คณะศิลปกรรมศาสตร์ (HUM4)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('FA01', 'Visual Arts', 'ทัศนศิลป์', 'HUM4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('FA02', 'Western Music', 'ดุริยางคศิลป์ตะวันตก', 'HUM4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('FA03', 'Thai Music', 'ดุริยางคศิลป์ไทย', 'HUM4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('FA04', 'Performing Arts', 'ศิลปะการแสดง', 'HUM4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('FA05', 'Communication Design', 'การออกแบบนิเทศศิลป์', 'HUM4');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('FA06', 'Culture, Fine Arts and Design', 'วัฒนธรรม ศิลปกรรมและการออกแบบ', 'HUM4');
+
+-- คณะเศรษฐศาสตร์ (HUM5)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('EC01', 'Economics', 'เศรษฐศาสตร์', 'HUM5');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('EC02', 'International Economics (International Program)', 'เศรษฐศาสตร์ระหว่างประเทศ (นานาชาติ)', 'HUM5');
+
+-- คณะนิติศาสตร์ (HUM6)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('LA01', 'Law', 'นิติศาสตร์', 'HUM6');
+
+-- วิทยาลัยการปกครองท้องถิ่น (HUM7)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('CO01', 'Public Administration', 'รัฐประศาสนศาสตร์', 'HUM7');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('CO02', 'Fiscal Management', 'การจัดการการคลัง', 'HUM7');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('CO03', 'Urban Management', 'การจัดการเมือง', 'HUM7');
+
+-- วิทยาลัยบัณฑิตศึกษาการจัดการ (HUM8)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('MB01', 'Master of Business Administration (Young Executive)', 'บริหารธุรกิจมหาบัณฑิต (Young Executive)', 'HUM8');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('MB02', 'Master of Business Administration (Executive)', 'บริหารธุรกิจมหาบัณฑิต (Executive)', 'HUM8');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('MB03', 'Master of Business Administration (SME)', 'บริหารธุรกิจมหาบัณฑิต (SME)', 'HUM8');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('MB04', 'Doctor of Philosophy (Management)', 'ปรัชญาดุษฎีบัณฑิต (การจัดการ)', 'HUM8');
+
+-- วิทยาลัยนานาชาติ (COl1)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IC01', 'Global Business', 'ธุรกิจโลก', 'COl1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IC02', 'International Marketing', 'การตลาดระหว่างประเทศ', 'COl1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IC03', 'International Affairs', 'กิจการระหว่างประเทศ', 'COl1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IC04', 'Tourism Management', 'การจัดการการท่องเที่ยว', 'COl1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IC05', 'Communication Arts', 'นิเทศศาสตร์', 'COl1');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IC06', 'Information Technology', 'เทคโนโลยีสารสนเทศ', 'COl1');
+
+-- คณะสหวิทยาการ (COl2)
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS01', 'Fisheries and Aquatic Resources', 'ทรัพยากรประมงและแหล่งน้ำ', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS02', 'Agribusiness and Food Innovation', 'นวัตกรรมเกษตรและอาหาร', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS03', 'Environmental Science and Technology', 'วิทยาศาสตร์และเทคโนโลยีสิ่งแวดล้อม', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS04', 'Applied Computer Science and AI', 'วิทยาการคอมพิวเตอร์และปัญญาประดิษฐ์ประยุกต์', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS05', 'Applied Statistics and Data Science', 'สถิติประยุกต์และวิทยาการข้อมูล', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS06', 'Logistics and Supply Chain Management', 'การจัดการโลจิสติกส์และโซ่อุปทาน', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS07', 'International Business and Entrepreneurship', 'ธุรกิจระหว่างประเทศและการเป็นผู้ประกอบการ', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS08', 'Accounting and Financial Management', 'บัญชีและการจัดการการเงิน', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS09', 'Tourism and Service Industry Management', 'การจัดการอุตสาหกรรมการท่องเที่ยวและบริการ', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS10', 'Public Administration', 'รัฐประศาสนศาสตร์', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS11', 'Law', 'นิติศาสตร์', 'COl2');
+INSERT INTO Major (MjCode, MjNameENG, MjNameTHA, FCode) VALUES('IS12', 'English for International Communication', 'ภาษาอังกฤษเพื่อการสื่อสารนานาชาติ', 'COl2');
+-- กลุ่มวิทยาศาสตร์และเทคโนโลยี
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A001', 'สมชาย', 'รักดี', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A002', 'สมศรี', 'มีสุข', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A003', 'มานะ', 'ขยันยิ่ง', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A004', 'ปิติ', 'ยินดี', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A005', 'ชูใจ', 'ใฝ่รู้', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A006', 'วิชัย', 'เก่งกาจ', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A007', 'อรวรรณ', 'งามตา', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A008', 'นพดล', 'รักษ์ไทย', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A009', 'สุชาติ', 'พัฒนา', 'TEC1', 'AR01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('A010', 'วันดี', 'มีโชคชัย', 'TEC1', 'AR01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T001', 'อนุชา', 'ชาญชัย', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T002', 'ธิดา', 'ดารารัตน์', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T003', 'อภินันท์', 'มั่นคง', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T004', 'ศิริพร', 'พรประเสริฐ', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T005', 'วีระ', 'รักชาติ', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T006', 'ประเสริฐ', 'เลิศล้ำ', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T007', 'สุวิทย์', 'จิตรอารี', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T008', 'พิมพา', 'พาดวงใจ', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T009', 'กฤษดา', 'ดาราเรือง', 'TEC2', 'TC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('T010', 'นารี', 'ศรีสวัสดิ์', 'TEC2', 'TC01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E001', 'สมศักดิ์', 'ภักดีบุญ', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E002', 'สมฤดี', 'ศรีนคร', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E003', 'วิโรจน์', 'โชติช่วง', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E004', 'นันทนา', 'พาเจริญ', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E005', 'พิชัย', 'ใจสะอาด', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E006', 'อัมพร', 'สุนทรเวช', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E007', 'เอกชัย', 'ไทยรุ่งเรือง', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E008', 'จินตนา', 'พานิชย์', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E009', 'ทวี', 'ศรีทอง', 'TEC3', 'EN01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('E010', 'ปราณี', 'ดีเสมอ', 'TEC3', 'EN01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S001', 'เกียรติ', 'เจริญยิ่ง', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S002', 'กัลยา', 'พาสุข', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S003', 'ณรงค์', 'พงษ์ศักดิ์', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S004', 'นลิน', 'ทิพย์มา', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S005', 'ทินกร', 'ภมรบุตร', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S006', 'บุญชัย', 'ใจสว่าง', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S007', 'พงศกร', 'พรสวรรค์', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S008', 'มารุต', 'อุตสาหะ', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S009', 'รัชนี', 'ดียิ่ง', 'TEC4', 'SC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('S010', 'ลัดดา', 'พาสวย', 'TEC4', 'SC01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R001', 'วรวุฒิ', 'วุฒิชัย', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R002', 'ศรัญญา', 'ญาณสิทธิ์', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R003', 'สถาพร', 'พรกมล', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R004', 'หทัย', 'ทิพย์โอสถ', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R005', 'อภิชาติ', 'ชาติเจริญ', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R006', 'อารีย์', 'รักสงบ', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R007', 'ชัยวัฒน์', 'วัฒนากูล', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R008', 'ธนพร', 'พรพิทักษ์', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R009', 'พัชรา', 'ราชภักดี', 'TEC5', 'AT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('R010', 'มนัส', 'สุนทรศาสตร์', 'TEC5', 'AT01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C001', 'ยุทธนา', 'นาคประสิทธิ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C002', 'ลลิตา', 'ตารักษ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C003', 'วิภาดา', 'ดาราฉาย', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C004', 'ศุภชัย', 'ชัยชนะ', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C005', 'สุรชัย', 'ชัยฤทธิ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C006', 'อลงกรณ์', 'กมลเนตร', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C007', 'กนกวรรณ', 'วรรณศรี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C008', 'ขวัญชัย', 'ชัยกมล', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C009', 'จิราพร', 'พรสถิต', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C010', 'ฉัตรชัย', 'ชัยพฤกษ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C011', 'ชลธิดา', 'ธิดารัตน์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C012', 'ญาณิศา', 'ศาตศิลป์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C013', 'ฐิติมา', 'มารศรี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C014', 'ณัฐวุฒิ', 'วุฒิศักดิ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C015', 'ดนัย', 'นัยพินิจ', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C016', 'ตระการ', 'กานต์สินี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C017', 'ถิรยุทธ์', 'ยุทธศาสตร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C018', 'ทักษิณา', 'ณาณเวช', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C019', 'ธนชัย', 'ชัยทัศน์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C020', 'นฤมล', 'มลทิน', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C021', 'บรรยง', 'ยงยุทธ', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C022', 'ประภัสสร', 'สรลักษณ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C023', 'ผกามาศ', 'มาศสุริย์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C024', 'พงษ์พันธ์', 'พันธ์พยัคฆ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C025', 'ภัทรา', 'ราเมศวร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C026', 'มงคล', 'คลจิตร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C027', 'ยลดา', 'ดาดุษฎี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C028', 'รุ่งทิวา', 'วาณิชย์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C029', 'ลดาวรรณ', 'วรรณรักษ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C030', 'วรัญญู', 'ญูประยูร', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C031', 'ศศิธร', 'ธรณิศร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C032', 'สกลพรรณ', 'พรรณวดี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C033', 'หริภัทร', 'ภัทรเวช', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C034', 'อมรา', 'ราเชนทร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C035', 'อังคณา', 'ณาณทิพย์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C036', 'กิตติพงศ์', 'พงศ์พิพัฒน์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C037', 'ขจรศักดิ์', 'ศักดิ์สิทธิ์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C038', 'จันทิมา', 'มารตี', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C039', 'ชยพล', 'พลากร', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C040', 'ณัฐพล', 'พลานุภาพ', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C041', 'ดุษฎี', 'ดีประเสริฐ', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C042', 'ทรงยศ', 'ยศไกร', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C043', 'ธนาธร', 'ธรณินทร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C044', 'นันทกร', 'กรภัทร์', 'TEC6', 'CP01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C045', 'บูรพา', 'พาทิศ', 'TEC6', 'CP01');
+
+-- กลุ่มวิทยาศาสตร์สุขภาพ
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N001', 'ปฐมพงษ์', 'พงษ์พานิช', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N002', 'พรทิพย์', 'ทิพย์มณี', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N003', 'ภานุวัตน์', 'วัตน์สิริ', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N004', 'มนตรี', 'ตรีพงษ์', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N005', 'ยศสรัล', 'รัลเมธา', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N006', 'รจนา', 'นาคปรีชา', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N007', 'ลักษมี', 'มีมงคล', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N008', 'วรพจน์', 'พจน์วิบูลย์', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N009', 'ศุภโชค', 'โชคสิริ', 'HEL1', 'NU01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('N010', 'สุมิตรา', 'ตราภูมิ', 'HEL1', 'NU01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M001', 'หทัยรัตน์', 'รัตน์ใจ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M002', 'อนุสรณ์', 'สรณ์สิริ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M003', 'กฤษณา', 'ณาณุวัติ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M004', 'ขวัญเรือน', 'เรือนแก้ว', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M005', 'จักรกฤษณ์', 'กฤษณ์เมธี', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M006', 'ชลดา', 'ดารณี', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M007', 'ฐาปกรณ์', 'กรณ์กิจ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M008', 'ณัฐกานต์', 'กานต์ศิริ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M009', 'ดารัตน์', 'รัตน์มณี', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M010', 'ตฤณมุท', 'มุทิตา', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M011', 'ทิฆัมพร', 'พรหมเมศ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M012', 'ธีรยุทธ', 'ยุทธพงษ์', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M013', 'นรเศรษฐ์', 'เศรษฐาคุณ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M014', 'ปรียานุช', 'นุชนาถ', 'HEL2', 'MD01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('M015', 'พงศธร', 'ธรณ์เทพ', 'HEL2', 'MD01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('B001', 'ภควัต', 'วัตน์สิริกุล', 'HEL3', 'MT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('B002', 'มนทิรา', 'ราตรี', 'HEL3', 'MT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('B003', 'ยิ่งยศ', 'ยศธนา', 'HEL3', 'MT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('B004', 'รังสรรค์', 'สรรพกิจ', 'HEL3', 'MT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('B005', 'ลัดดาวัลย์', 'วัลย์ลภา', 'HEL3', 'MT01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C901', 'วิทวัส', 'วัสนานนท์', 'HEL4', 'PH01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C902', 'ศิริชัย', 'ชัยมงคล', 'HEL4', 'PH01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C903', 'สมบูรณ์', 'บูรพา', 'HEL4', 'PH01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C904', 'หิรัญ', 'รัญสิริ', 'HEL4', 'PH01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('C905', 'อภิญญา', 'ญานี', 'HEL4', 'PH01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('D001', 'เกรียงไกร', 'ไกรสร', 'HEL5', 'DT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('D002', 'จารุวรรณ', 'วรรณรักษ์', 'HEL5', 'DT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('D003', 'ชัชวาล', 'วาลย์มณี', 'HEL5', 'DT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('D004', 'ญาณวุฒิ', 'วุฒิศิลป์', 'HEL5', 'DT01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('D005', 'ณรงค์ฤทธิ์', 'ฤทธิ์รงค์', 'HEL5', 'DT01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('F001', 'ดุจเดือน', 'เดือนสว่าง', 'HEL6', 'PS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('F002', 'ถนอม', 'นอมจิตร', 'HEL6', 'PS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('F003', 'ทวีโชค', 'โชคอำนวย', 'HEL6', 'PS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('F004', 'ธัญญา', 'ญารัตน์', 'HEL6', 'PS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('F005', 'นพรัตน์', 'รัตน์นพ', 'HEL6', 'PS01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('G001', 'บุญญฤทธิ์', 'ฤทธิ์บุญ', 'HEL7', 'VM01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('G002', 'ปฏิภาณ', 'ภาณุมาศ', 'HEL7', 'VM01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('G003', 'พงศกร', 'กรพงศ์', 'HEL7', 'VM01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('G004', 'ภากร', 'กรเมศ', 'HEL7', 'VM01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('G005', 'มนัญญา', 'ญานิน', 'HEL7', 'VM01');
+
+-- กลุ่มมนุษยศาสตร์และสังคมศาสตร์
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('I001', 'สิทธิโชค', 'โชคสิทธิกุล', 'HUM1', 'ED01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('I002', 'เหมวิช', 'วิชยุตม์', 'HUM1', 'ED01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('I003', 'อนงค์', 'นงคราญ', 'HUM1', 'ED01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('I004', 'กมลชนก', 'ชนกนันท์', 'HUM1', 'ED01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('I005', 'จตุพล', 'พลจตุร', 'HUM1', 'ED01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('H001', 'ยงยุทธ', 'ยุทธนา', 'HUM2', 'HS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('H002', 'รุจิเรข', 'เรขารัตน์', 'HUM2', 'HS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('H003', 'ลออ', 'ออมทรัพย์', 'HUM2', 'HS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('H004', 'วสันต์', 'สันต์สิริ', 'HUM2', 'HS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('H005', 'ศราวุธ', 'วุธศิริ', 'HUM2', 'HS01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('J001', 'ชาญวิทย์', 'วิทย์ชาญ', 'HUM3', 'BS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('J002', 'ฐิติพันธ์', 'พันธ์ศิริ', 'HUM3', 'BS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('J003', 'ณภัทร', 'ภัทรวดี', 'HUM3', 'BS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('J004', 'ดิเรก', 'เรขศิลป์', 'HUM3', 'BS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('J005', 'ตวงสิทธิ์', 'สิทธิ์ตวง', 'HUM3', 'BS01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('K001', 'ทรงกลด', 'กลดทรัพย์', 'HUM4', 'FA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('K002', 'ธำรงศักดิ์', 'ศักดิ์ธำรง', 'HUM4', 'FA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('K003', 'นเรศ', 'เรศนรี', 'HUM4', 'FA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('K004', 'บวรศักดิ์', 'ศักดิ์บวร', 'HUM4', 'FA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('K005', 'ประกอบ', 'กอบเกียรติ', 'HUM4', 'FA01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('P001', 'รณภพ', 'ภพรณ', 'HUM6', 'LA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('P002', 'ลือชา', 'ชาลือ', 'HUM6', 'LA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('P003', 'วิชิต', 'ชิตชัย', 'HUM6', 'LA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('P004', 'ศักดิ์สิทธิ์', 'สิทธิ์ศักดิ์', 'HUM6', 'LA01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('P005', 'สรวิชญ์', 'วิชญ์สร', 'HUM6', 'LA01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('Q001', 'หัสธนพงศ์', 'พงศ์หัส', 'HUM7', 'CO01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('Q002', 'อติรุจ', 'รุจอติ', 'HUM7', 'CO01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('Q003', 'กรกฎ', 'กฎเกณฑ์', 'HUM7', 'CO01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('Q004', 'จริยา', 'ยาจริต', 'HUM7', 'CO01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('Q005', 'ชัชพิสิฐ', 'สิฐพิชัช', 'HUM7', 'CO01');
+
+-- แมปคณะอื่นๆ เพิ่มเติมเพื่อให้ครบทุก Record ในตาราง Teacher
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('L001', 'ผลึก', 'ลึกซึ้ง', 'HUM5', 'EC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('L002', 'พิทักษ์', 'ทักษิณ', 'HUM5', 'EC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('L003', 'ภูผา', 'ผาภูมิ', 'HUM5', 'EC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('L004', 'มณฑล', 'ทลรักษ์', 'HUM5', 'EC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('L005', 'ยอดเยี่ยม', 'เยี่ยมยุทธ', 'HUM5', 'EC01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('U001', 'ญาดา', 'ดาราญา', 'HUM8', 'MB01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('U002', 'ณัชชา', 'ชาณัช', 'HUM8', 'MB01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('U003', 'ดรุณี', 'ณีดรุณ', 'HUM8', 'MB01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('U004', 'ตรีมูรติ', 'รติตรี', 'HUM8', 'MB01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('U005', 'ถาวร', 'วรช่าง', 'HUM8', 'MB01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V001', 'ทัศนีย์', 'นีย์ทัศน์', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V002', 'ธัชกร', 'กรธัช', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V003', 'นรินทร์', 'รินทร์นรี', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V004', 'บดินทร์', 'ทร์บดิน', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V005', 'ปรารถนา', 'นาปรารถ', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V006', 'พรรณราย', 'รายพรรณ', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V007', 'ภัทรวรรณ', 'วรรณภัทร', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V008', 'มยุรี', 'รีมยุ', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V009', 'ยุพเรศ', 'เรศยุพ', 'COl1', 'IC01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('V010', 'รจเรข', 'เรขรจ', 'COl1', 'IC01');
+
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('W001', 'ลลนา', 'นาลล', 'COl2', 'IS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('W002', 'วรางคณา', 'ณาณวราง', 'COl2', 'IS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('W003', 'ศศิวิมล', 'มลศศิ', 'COl2', 'IS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('W004', 'สโรชา', 'ชาสโร', 'COl2', 'IS01');
+INSERT INTO Teacher (TID, TFName, TLName, FCode, MjCode) VALUES('W005', 'หทัยทิพย์', 'ทิพย์หทัย', 'COl2', 'IS01');
+
+INSERT INTO Event (EventID, EventName, EventStartDate, EventEndDate, EventType) 
+VALUES ('E001', 'ปฐมนิเทศนักศึกษาใหม่ 2569', TO_DATE('2026-06-01', 'YYYY-MM-DD'), TO_DATE('2026-06-01', 'YYYY-MM-DD'), 'Academic');
+INSERT INTO Event (EventID, EventName, EventStartDate, EventEndDate, EventType) 
+VALUES ('E002', 'สอบกลางภาค', TO_DATE('2026-03-23', 'YYYY-MM-DD'), TO_DATE('2026-03-28', 'YYYY-MM-DD'), 'Examination');
+
+INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) 
+VALUES ('CP101001', 'Introduction to AI', 3, 'TEC6', 'Core Course');
+INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) 
+VALUES ('CP101002', 'Database Systems', 3, 'TEC6', 'Core Course');
+
+INSERT INTO UserInfo (UserID, UserFName, UserLName, UserEmail, UserPass, FCode, MjCode, UserType) 
+VALUES (67001, 'กิตติ', 'รักการเรียน', 'kitti@kkumail.com', 'pass123', 'TEC6', 'CP01', 'STD');
+INSERT INTO UserInfo (UserID, UserFName, UserLName, UserEmail, UserPass, FCode, MjCode, UserType) 
+VALUES (67002, 'มารตี', 'มีมานะ', 'maratee@kkumail.com', 'pass123', 'TEC6', 'CP02', 'STD');
+
+INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
+VALUES ('TA001', 'C001', 'CP101001', 2026, 1, 'MONDAY', TO_TIMESTAMP('09:00', 'HH24:MI'), TO_TIMESTAMP('12:00', 'HH24:MI'), 'CP.01');
+INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
+VALUES ('TA002', 'C002', 'CP101002', 2026, 1, 'WEDNESDAY', TO_TIMESTAMP('13:00', 'HH24:MI'), TO_TIMESTAMP('16:00', 'HH24:MI'), 'CP.02');
+
+INSERT INTO StudyRegister (StuRegisID, TAssignID, UserID, Section, StuRegisStatus) VALUES (10001, 'TA001', 67001, 1, 'ENROLLED');
+INSERT INTO StudyRegister (StuRegisID, TAssignID, UserID, Section, StuRegisStatus) VALUES (10002, 'TA002', 67001, 1, 'ENROLLED');
+INSERT INTO StudyRegister (StuRegisID, TAssignID, UserID, Section, StuRegisStatus) VALUES (10003, 'TA002', 67002, 1, 'ENROLLED');
+
+INSERT INTO Register (RegID, UserID, EventID) VALUES ('R0001', 67001, 'E001');
+
+INSERT INTO StdAssignment (AssignID, SubjCode, AssName, Dateline, Score) 
+VALUES ('ASS00001', 'CP101002', 'Database Project Design', TO_DATE('2026-03-16', 'YYYY-MM-DD'), 100);
+
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (20001, 67001, 'ASS00001', 'SUBMITTED', 85);
+
+INSERT INTO Grade (GradeCode, StuRegisID, GradeResult) VALUES (30001, 10001, 'B+');
+
+INSERT INTO ReviewTeacher (TeachReview, TAssignID, UserID, UserReviewT, UserRateT) 
+VALUES (40001, 'TA001', 67001, 'สอนดีมาก', 5);
+
+INSERT INTO RegistrationStatus (UserID, Status) VALUES (67001, 'ACTIVE');
+INSERT INTO RegistrationStatus (UserID, Status) VALUES (67002, 'ACTIVE');
+
+INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) VALUES ('CP101', 'AI Intro', 3, 'TEC6', 'Core');
+INSERT INTO Subject (SubjCode, SubjName, SubjCredit, FCode, SubjType) VALUES ('CP102', 'Database', 3, 'TEC6', 'Core');
+
+INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
+VALUES ('TA01', 'C001', 'CP101', 2026, 1, 'MONDAY', TO_TIMESTAMP('09:00','HH24:MI'), TO_TIMESTAMP('12:00','HH24:MI'), 'CP.01');
+INSERT INTO TeachAssignment (TAssignID, TID, SubjCode, Year, Semester, StudyDay, StartTime, EndTime, Room) 
+VALUES ('TA02', 'C002', 'CP102', 2026, 1, 'WEDNESDAY', TO_TIMESTAMP('13:00','HH24:MI'), TO_TIMESTAMP('16:00','HH24:MI'), 'CP.02');
+
+INSERT INTO UserInfo VALUES (67003, 'สมชาย', 'ใจดีจริง', 'somchai@kku.ac.th', 'pw123', 'TEC6', 'CP02', 'STD');
+INSERT INTO UserInfo VALUES (67004, 'วิไล', 'ไฉไล', 'wilai@kku.ac.th', 'pw123', 'TEC6', 'CP02', 'STD');
+INSERT INTO UserInfo VALUES (67005, 'ปิติ', 'มีสุข', 'piti@kku.ac.th', 'pw123', 'TEC6', 'CP01', 'STD');
+INSERT INTO UserInfo VALUES (67006, 'มานะ', 'อดทนเก่ง', 'mana@kku.ac.th', 'pw123', 'TEC6', 'CP01', 'STD');
+INSERT INTO UserInfo VALUES (67007, 'ชูใจ', 'รักเพื่อน', 'choojai@kku.ac.th', 'pw123', 'TEC6', 'CP02', 'STD');
+INSERT INTO UserInfo VALUES (67008, 'วีระ', 'กล้าหาญ', 'weera@kku.ac.th', 'pw123', 'TEC6', 'CP02', 'STD');
+INSERT INTO UserInfo VALUES (67009, 'ดวงใจ', 'บริสุทธิ์', 'duangjai@kku.ac.th', 'pw123', 'TEC6', 'CP01', 'STD');
+INSERT INTO UserInfo VALUES (67010, 'สมศรี', 'ดีงาม', 'somsri@kku.ac.th', 'pw123', 'TEC6', 'CP02', 'STD');
+
+INSERT INTO StudyRegister VALUES (101, 'TA01', 67001, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (102, 'TA02', 67001, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (103, 'TA01', 67002, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (104, 'TA02', 67003, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (105, 'TA01', 67004, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (106, 'TA02', 67005, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (107, 'TA01', 67006, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (108, 'TA02', 67007, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (109, 'TA01', 67008, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (110, 'TA02', 67009, 1, 'ENROLLED');
+INSERT INTO StudyRegister VALUES (111, 'TA01', 67010, 1, 'ENROLLED');
+
+INSERT INTO StdAssignment VALUES ('ASS01', 'CP101', 'AI Lab 1', TO_DATE('2026-03-20','YYYY-MM-DD'), 100);
+INSERT INTO StdAssignment VALUES ('ASS02', 'CP102', 'DB Project', TO_DATE('2026-03-25','YYYY-MM-DD'), 100);
+
+INSERT INTO AssignScore VALUES (201, 67001, 'ASS01', 'SUBMITTED', 85);
+INSERT INTO AssignScore VALUES (202, 67002, 'ASS01', 'SUBMITTED', 90);
+INSERT INTO AssignScore VALUES (203, 67003, 'ASS02', 'SUBMITTED', 75);
+INSERT INTO AssignScore VALUES (204, 67001, 'ASS02', 'NOT SUBMITTED', 0);
+
+INSERT INTO Grade VALUES (301, 101, 'A');
+INSERT INTO Grade VALUES (302, 102, 'B+');
+INSERT INTO Grade VALUES (303, 103, 'C');
+INSERT INTO Grade VALUES (304, 104, 'A');
+
+INSERT INTO Event VALUES ('E01', 'AI Hackathon', TO_DATE('2026-04-01','YYYY-MM-DD'), TO_DATE('2026-04-02','YYYY-MM-DD'), 'Contest');
+INSERT INTO Register VALUES ('REG01', 67001, 'E01');
+INSERT INTO Register VALUES ('REG02', 67002, 'E01');
+INSERT INTO Register VALUES ('REG03', 67003, 'E01');
+
+INSERT INTO ReviewTeacher VALUES (401, 'TA01', 67001, 'สอนเข้าใจง่ายมาก', 5);
+INSERT INTO ReviewTeacher VALUES (402, 'TA02', 67003, 'เนื้อหาแน่นไปนิดนึง', 4);
+
+DELETE FROM RegistrationStatus;
+INSERT INTO RegistrationStatus SELECT UserID, 'ACTIVE' FROM UserInfo;
+
+DELETE FROM Notifications;
+
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67001, 'คุณมีเรียนวิชา AI Intro (CP101) วันนี้ กรุณาเตรียมตัวก่อนเข้าเรียน', SYSDATE-1, 'UNREAD');
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67001, 'งานสั่งใหม่: Database Project ถึงกำหนดส่งพรุ่งนี้อย่าลืมทำ!', SYSDATE, 'UNREAD');
+
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67002, 'อาจารย์อัปเดตคะแนนวิชา Database คุณได้คะแนน 45/50 ยินดีด้วย', SYSDATE-2, 'UNREAD');
+
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67003, 'ประกาศ: ย้ายห้องเรียน CP.01 ชั่วคราวเนื่องจากมีการซ่อมแซมแอร์', SYSDATE, 'UNREAD');
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67004, 'วิชา Database (TA02) งดคลาสสัปดาห์หน้า ให้นักศึกษาทำใบงาน CP.05 เป็นการทดแทน', SYSDATE-1, 'UNREAD');
+
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67005, 'ขอเชิญนักศึกษาเข้าร่วมกิจกรรมปฐมนิเทศนักศึกษาใหม่ ประจำปีการศึกษา 2569', SYSDATE-3, 'UNREAD');
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67006, 'ด่วนสุดๆ: ทุนการศึกษาสำหรับนักศึกษาเรียนดีเปิดรับสมัครแล้ววันนี้', SYSDATE-5, 'READ');
+
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67007, 'เปิดระบบลงทะเบียนเรียนภาคการศึกษา 2/2568 วันนี้ อย่าลืมเข้าระบบ', SYSDATE-1, 'UNREAD');
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67008, 'เตือน: คุณยังไม่ได้ชำระค่าธรรมเนียมการศึกษาประจำเทอมนี้', SYSDATE, 'UNREAD');
+
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67009, 'ประกาศผลสอบกลางภาควิชา AI Intro เข้าไปดูคะแนนได้ในระบบ', SYSDATE-2, 'UNREAD');
+INSERT INTO Notifications (UserID, Message, NotiDate, Status) 
+VALUES (67010, 'เกรดออกแล้ว: ผลการเรียนวิชาภาษาอังกฤษ (HS02) อัปเดตเข้าระบบ', SYSDATE, 'UNREAD');
+
+INSERT INTO Event (EventID, EventName, EventStartDate, EventEndDate, EventType) 
+VALUES ('E101', 'ค่ายอาสาพัฒนาชุมชน 2568', TO_DATE('2026-01-10', 'YYYY-MM-DD'), TO_DATE('2026-01-12', 'YYYY-MM-DD'), 'Student Activity');
+
+INSERT INTO Event (EventID, EventName, EventStartDate, EventEndDate, EventType) 
+VALUES ('E102', 'อบรมการใช้งาน Git และ GitHub', TO_DATE('2026-02-01', 'YYYY-MM-DD'), TO_DATE('2026-02-02', 'YYYY-MM-DD'), 'Academic Workshop');
+
+INSERT INTO Event (EventID, EventName, EventStartDate, EventEndDate, EventType) 
+VALUES ('E103', 'การแข่งขันกีฬาสีภายในคณะวิศวกรรมศาสตร์', TO_DATE('2026-02-15', 'YYYY-MM-DD'), TO_DATE('2026-02-16', 'YYYY-MM-DD'), 'Sports');
+
+INSERT INTO Register (RegID, UserID, EventID) VALUES ('R1001', 67001, 'E101');
+INSERT INTO Register (RegID, UserID, EventID) VALUES ('R1002', 67001, 'E102');
+INSERT INTO Register (RegID, UserID, EventID) VALUES ('R1003', 67002, 'E103');
+
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (205, 67005, 'ASS01', 'SUBMITTED', 88);
+
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (206, 67006, 'ASS01', 'SUBMITTED', 92);
+
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (207, 67002, 'ASS02', 'SUBMITTED', 85);
+
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (208, 67004, 'ASS01', 'SUBMITTED', 95);
+
+INSERT INTO AssignScore (ScoreAssignID, UserID, AssignID, Status, PriScore) 
+VALUES (209, 67007, 'ASS01', 'SUBMITTED', 87);
+
+COMMIT;
+
+SELECT * FROM Fact;
+SELECT * FROM Major;
+SELECT * FROM Teacher;
+SELECT * FROM Subject;
+SELECT * FROM Event;
+
+SELECT * FROM UserInfo;
+SELECT * FROM RegistrationStatus;
+SELECT * FROM TeachAssignment;
+SELECT * FROM StudyRegister;
+SELECT * FROM Register;
+
+SELECT * FROM StdAssignment;
+SELECT * FROM AssignScore;
+SELECT * FROM Grade;
+SELECT * FROM ReviewTeacher;
+SELECT * FROM Notifications;
+
+SELECT * FROM v_student_gpa;
+SELECT * FROM student_daily_schedule;
+SELECT * FROM student_pending_assignments;
+SELECT * FROM v_student_dashboard;
+SELECT * FROM v_faculty_student_count;
+SELECT * FROM v_student_event_summary;
+SELECT * FROM v_teacher_performance_rating;
+SELECT * FROM v_event_popularity;
+SELECT * FROM v_student_feedbacks;
+SELECT * FROM v_freshmen_events_board;
+
+SELECT object_name, status 
+FROM user_objects 
+WHERE object_type = 'PROCEDURE';
+
+SET SERVEROUTPUT ON;
+
+EXEC sp_get_student_alerts(67001);
+
+EXEC sp_safe_event_register(67001, 'E002');
+
+SELECT trigger_name, trigger_type, triggering_event, table_name, status 
+FROM user_triggers;
+
+UPDATE AssignScore SET PriScore = 95 WHERE ScoreAssignID = 20001;
+
+SELECT * FROM Notifications ORDER BY NotiDate DESC;
+
